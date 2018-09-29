@@ -12,40 +12,53 @@ struct User {
 	char* second_name = new char[32];
 	int age;
 	int* date = new int[3];
+	int id;
 	User* next;
 };
 
 void printList(User* first);
-User* createUser();
-User* createUserRand();
+void printUser(User* first);
+User* createUser(int &vacant_id);
+User* createUserRand(int &vacant_id);
+User* fillUser(int &vacant_id);
+User* fillUserRand(int &vacant_id);
 void addAtEnd(User** first, User* nUser);
 void addAtBegin(User** root, User* nUser);
 User* reverse(User* x);	
 User* deleteUser(User* head, User* someUser);
-User* search(User* user, int val);
 User* insert(User* head, User* next_User, User* prev_User);
+User* search_set(User* user);
+User* search_id(User* user);
+User* search_f_name(User* user);
+User* search_s_name(User* user);
+User* search_age(User* user);
+User* search_brday(User* user);
+
 
 int main() {
 
 	SetConsoleOutputCP(1251);
 	SetConsoleCP(1251);
 
-	User* head = NULL;
+	User* head = nullptr;
+	int g_id = 1200;
 
 
 	for (int i = 0; i < 3; i++) {
-		addAtEnd(&head, createUserRand());
+		addAtEnd(&head, createUserRand(g_id));
 	}
 
 	printList(head);
 
-	addAtEnd(&head, createUserRand());
-	head = insert(head, head, createUserRand());
-	addAtBegin(&head, createUserRand());
+	addAtEnd(&head, createUserRand(g_id));
+	head = insert(head, head, createUserRand(g_id));
+	addAtBegin(&head, createUserRand(g_id));
+
+	//deleteUser(head, search_set(head));
 
 	printList(head);
 
-
+	printUser(search_set(head));
 
 	_getch();
 	return 0;
@@ -53,28 +66,33 @@ int main() {
 
 void printList(User* first) {
 	User* temp = first;
+	
+	cout << "ID" << setw(11) << "Фамилия" << setw(9) << "Имя" << setw(13) << "Полных лет" << setw(15) << "Дата рождения" << endl;
 
-	cout << setw(9) << "Фамилия" << setw(9) << "Имя" << setw(13) << "Полных лет" << setw(15) << "Дата рождения" << endl;
-
-	while (temp != NULL) {
-		std::cout << setw(9) << temp->first_name << setw(9) << temp->second_name << setw(10) << temp->age << setw(9);
-
-		
-
-		/*User* temp_date = temp;
-		for (int i = 0; i < 2; ++i) {
-			std::cout << *temp_date->date << ".";
-			temp_date->date = temp_date->date + 1;
-		}std::cout << *temp_date->date << std::endl;
-
-		//delete temp_date;*/
+	while (temp != nullptr) {
+		std::cout << temp->id << setw(11) << temp->first_name << setw(9) << temp->second_name << setw(10) << temp->age << setw(9);
+		std::cout << temp->date[0] << "." << temp->date[1] << "." << temp->date[2] << std::endl;
 
 		temp = temp->next;
 	}
 	std::cout << std::endl;
 }
 
-User* fillUser() {
+void printUser(User* first){
+	User* temp = first;
+	if (temp != nullptr) {
+		cout << "ID" << setw(11) << "Фамилия" << setw(9) << "Имя" << setw(13) << "Полных лет" << setw(15) << "Дата рождения" << endl;
+
+		std::cout << temp->id << setw(11) << temp->first_name << setw(9) << temp->second_name << setw(10) << temp->age << setw(9);
+		std::cout << temp->date[0] << "." << temp->date[1] << "." << temp->date[2] << std::endl;
+
+		std::cout << std::endl;
+	}else {
+		cout << endl << "ERROR: Не найдено данных!" << endl;
+	}
+}
+
+User* fillUser(int &vacant_id) {
 	User* tmpUser = new User;
 
 	std::cout << "First name: ";  std::cin.getline(tmpUser->first_name, 32);
@@ -83,44 +101,49 @@ User* fillUser() {
 	std::cout << "day: ";    std::cin >> tmpUser->date[0];
 	std::cout << "mounth: "; std::cin >> tmpUser->date[1];
 	std::cout << "year: ";   std::cin >> tmpUser->date[2];
+	vacant_id++;
+	tmpUser->id = vacant_id;	
+	tmpUser->next = nullptr;
 
 	return tmpUser;
 }
 
-User* createUser() {
-	User * nUser = new User;
-	std::cout << "First name: ";  std::cin.getline(nUser->first_name, 32);
-	std::cout << "Second name: "; std::cin.getline(nUser->second_name, 32);
-	std::cout << "Age: "; std::cin >> nUser->age;
-	std::cout << "day: ";    std::cin >> nUser->date[0];
-	std::cout << "mounth: "; std::cin >> nUser->date[1];
-	std::cout << "year: ";   std::cin >> nUser->date[2];
-	nUser->next = NULL;
-	return nUser;
-}
-
-User* createUserRand() {
+User* fillUserRand(int &vacant_id) {
 
 	char* f_names[] = { "Иван", "Сергей", "Дмитрий", "Александр", "Арсений", "Данил", "Михаил", "Кристина" };
 	char* s_names[] = { "Смирнов", "Иванов", "Кузнецов", "Соколов", "Попов", "Лебедев", "Алексеев", "Орлов" };
 
+	User* tmpUser = new User;
+	tmpUser->first_name = f_names[rand() % 8];
+	tmpUser->second_name = s_names[rand() % 8];
+	tmpUser->age = rand() % 40 + 22;
+		tmpUser->date[0] = rand() % 30 + 1;
+		tmpUser->date[1] = rand() % 12 + 1;
+		tmpUser->date[2] = 2018 - tmpUser->age;
+	vacant_id++;
+	tmpUser->id = vacant_id;
+		tmpUser->next = nullptr;
+	return tmpUser;
+}
+
+User* createUser(int &vacant_id) {
 	User * nUser = new User;
-	  nUser->first_name = f_names[rand() % 8];
-	  nUser->second_name = s_names[rand() % 8];
-      nUser->age = rand() % 40 + 22;
-	    nUser->date[0] = rand() % 30 + 1;
-		nUser->date[1] = rand() % 12 + 1;
-	    nUser->date[2] = 2018 - nUser->age;
-	  nUser->next = NULL;
+	nUser = fillUser(vacant_id);
+	return nUser;
+}
+
+User* createUserRand(int &vacant_id) {
+	User * nUser = new User;
+	nUser = fillUserRand(vacant_id);
 	return nUser;
 }
 	
 void addAtEnd(User** first, User* nUser) {
 	User* temp = *first;
-	if (temp == NULL) {
+	if (temp == nullptr) {
 		*first = nUser;
 	}else {
-		while (temp->next != NULL) {
+		while (temp->next != nullptr) {
 			temp = temp->next;
 		}
 		temp->next = nUser;
@@ -130,13 +153,6 @@ void addAtEnd(User** first, User* nUser) {
 void addAtBegin(User** root, User* nUser) {
 	nUser->next = *root;
 	*root = nUser;
-}
-
-User* search(User* user, int val) {
-	while (user != NULL && user->age != val) {
-		user = user->next;
-	}
-	return user;
 }
 
 User* insert(User* head, User* next_User, User* prev_User) { // insert new User before next_User
@@ -155,7 +171,8 @@ User* insert(User* head, User* next_User, User* prev_User) { // insert new User 
 }
 
 User* deleteUser(User* head, User* someUser) {
-	if (someUser != NULL) {
+
+	if (someUser != nullptr) {
 		if (someUser == head) {
 			head = head->next;
 			delete someUser;
@@ -173,8 +190,8 @@ User* deleteUser(User* head, User* someUser) {
 }
 
 User* reverse(User* x) {
-	User* tmp, *y = x, *r = NULL;
-	while (y != NULL) {
+	User* tmp, *y = x, *r = nullptr;
+	while (y != nullptr) {
 		tmp = y->next;
 		y->next = r;
 		r = y;
@@ -183,7 +200,85 @@ User* reverse(User* x) {
 	return r;
 }
 
+User* search_set(User* user) {
+	cout << " 1-id / 2-Имя / 3-Фамилия / 4-Возраст / 5-День Рождения " << endl;
+	cout << "Введите параметр поиска: ";
+	int set;
+	cin >> set;
 
+	switch (set) {
+		case 1: return search_id(user);
+			break;
+		case 2: return search_f_name(user);
+			break;
+		case 3: return search_s_name(user);
+			break;
+		case 4: return search_age(user);
+			break;
+		case 5: return search_brday(user);
+			break;
+	}
+}
+
+User* search_id(User* user) {
+
+	user = nullptr;
+
+	cout << "Введите id: ";
+	int val;
+	cin >> val;
+	while (user != nullptr && user->id != val) {
+		user = user->next;
+	}
+	
+	return user; 
+}
+
+User* search_f_name(User* user) {
+
+	cout << "Введите имя: ";
+	char* val = new char[32];
+	cin.getline(val, 32);
+	cin >> val;
+	while (user != nullptr && user->first_name != val) {
+		user = user->next;
+	}
+	return user;
+}
+
+User* search_s_name(User* user) {
+
+	cout << "Введите фамилию: ";
+	char* val = new char[32];
+	cin.getline(val, 32);
+	cin >> val;
+	while (user != nullptr && user->second_name != val) {
+		user = user->next;
+	}
+	return user;
+}
+
+User* search_age(User* user) {
+
+	cout << "Введите возраст: ";
+	int val;
+	cin >> val;
+	while (user != nullptr && user->age != val) {
+		user = user->next;
+	}
+	return user;
+}
+
+User* search_brday(User* user) {
+
+	cout << "Введите число: ";
+	int val;
+	cin >> val;
+	while (user != nullptr && user->date[0] != val) {
+		user = user->next;
+	}
+	return user;
+}
 
 
 
