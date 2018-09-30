@@ -1,9 +1,13 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <iostream>
 #include <conio.h>
 #include <string.h>
 #include <stdio.h>
 #include <Windows.h>
 #include <iomanip>
+
+
 
 using namespace std;
 
@@ -26,7 +30,7 @@ void addAtEnd(User** first, User* nUser);
 void addAtBegin(User** root, User* nUser);
 User* reverse(User* x);	
 User* deleteUser(User* head, User* someUser);
-User* insert(User* head, User* next_User, User* prev_User);
+void insert(User** head, User* next_User, User* prev_User);
 User* search_set(User* user);
 User* search_id(User* user);
 User* search_f_name(User* user);
@@ -51,7 +55,7 @@ int main() {
 	printList(head);
 
 	addAtEnd(&head, createUserRand(g_id));
-	head = insert(head, head, createUserRand(g_id));
+	insert(&head, head, createUserRand(g_id));
 	addAtBegin(&head, createUserRand(g_id));
 
 	//deleteUser(head, search_set(head));
@@ -67,7 +71,7 @@ int main() {
 void printList(User* first) {
 	User* temp = first;
 	
-	cout << "ID" << setw(11) << "Фамилия" << setw(9) << "Имя" << setw(13) << "Полных лет" << setw(15) << "Дата рождения" << endl;
+	cout << "ID" << setw(11) << "Имя" << setw(9) << "Фамилия" << setw(13) << "Полных лет" << setw(15) << "Дата рождения" << endl;
 
 	while (temp != nullptr) {
 		std::cout << temp->id << setw(11) << temp->first_name << setw(9) << temp->second_name << setw(10) << temp->age << setw(9);
@@ -81,7 +85,7 @@ void printList(User* first) {
 void printUser(User* first){
 	User* temp = first;
 	if (temp != nullptr) {
-		cout << "ID" << setw(11) << "Фамилия" << setw(9) << "Имя" << setw(13) << "Полных лет" << setw(15) << "Дата рождения" << endl;
+		cout << "ID" << setw(11) << "Имя" << setw(9) << "Фамилия" << setw(13) << "Полных лет" << setw(15) << "Дата рождения" << endl;
 
 		std::cout << temp->id << setw(11) << temp->first_name << setw(9) << temp->second_name << setw(10) << temp->age << setw(9);
 		std::cout << temp->date[0] << "." << temp->date[1] << "." << temp->date[2] << std::endl;
@@ -110,12 +114,12 @@ User* fillUser(int &vacant_id) {
 
 User* fillUserRand(int &vacant_id) {
 
-	char* f_names[] = { "Иван", "Сергей", "Дмитрий", "Александр", "Арсений", "Данил", "Михаил", "Кристина" };
-	char* s_names[] = { "Смирнов", "Иванов", "Кузнецов", "Соколов", "Попов", "Лебедев", "Алексеев", "Орлов" };
+	const char* f_names[] = { "Иван", "Сергей", "Дмитрий", "Александр", "Арсений", "Данил", "Михаил", "Кристина" };
+	const char* s_names[] = { "Смирнов", "Иванов", "Кузнецов", "Соколов", "Попов", "Лебедев", "Алексеев", "Орлов" };
 
 	User* tmpUser = new User;
-	tmpUser->first_name = f_names[rand() % 8];
-	tmpUser->second_name = s_names[rand() % 8];
+	strcpy(tmpUser->first_name, f_names[rand() % 8]);	//tmpUser->first_name = f_names[rand() % 8];
+	strcpy(tmpUser->second_name, s_names[rand() % 8]);	//tmpUser->second_name = s_names[rand() % 8];
 	tmpUser->age = rand() % 40 + 22;
 		tmpUser->date[0] = rand() % 30 + 1;
 		tmpUser->date[1] = rand() % 12 + 1;
@@ -137,6 +141,21 @@ User* createUserRand(int &vacant_id) {
 	nUser = fillUserRand(vacant_id);
 	return nUser;
 }
+
+void add_set(User* head, int global_id) {
+	int set = 0;
+	cout << "1-Добавить в начало / 2-Добавить в конец / 3-Добавить перед ячейкой ";
+	cout << "Введите вариант добавления: ";
+	
+	switch (set) {
+		case 1: addAtBegin(&head, createUserRand(global_id));
+			break;
+		case 2: addAtEnd(&head, createUserRand(global_id));
+			break;
+		case 3: insert(&head, search_set(), createUserRand(global_id));
+			break;
+	}
+}
 	
 void addAtEnd(User** first, User* nUser) {
 	User* temp = *first;
@@ -155,20 +174,20 @@ void addAtBegin(User** root, User* nUser) {
 	*root = nUser;
 }
 
-User* insert(User* head, User* next_User, User* prev_User) { // insert new User before next_User
-	if (next_User == head) {
-		prev_User->next = head;
-		head = prev_User;
+void insert(User** head, User* next_User, User* prev_User) { // insert new User before next_User
+	if (next_User == *head) {
+		prev_User->next = *head;
+		*head = prev_User;
 	}else {
-		User* tmp = head;
+		User* tmp = *head;
 		while (tmp->next != next_User) {
 			tmp = tmp->next;
 		}
 		prev_User->next = next_User;
 		tmp->next = prev_User;
 	}
-	return head;
 }
+
 
 User* deleteUser(User* head, User* someUser) {
 
@@ -280,18 +299,24 @@ User* search_brday(User* user) {
 	return user;
 }
 
-void menu() {
+//void menu() {
+//	int choose = 0;
+//	cout << "Введите параметр поиска: ";
+//}
 
-}
 
-void action_set() {
-	cout << " 1-Добавить нового пользователя / 2-Удалить пользователя  / 3-Добавить рандомного пользователя / 4-Возраст / 5-День Рождения " << endl;
+
+void action_set(User* head) {
+	cout << " 0-Показать список / 1-Добавить нового пользователя / 2-Удалить пользователя  / 3-Добавить рандомного пользователя /" << endl
+		 << " 4-Сортировать список / 5-Загрузить список / 6-Сохранить список в файл /  " << endl;
 	cout << "Введите параметр поиска: ";
 	int set;
 	cin >> set;
 
-	switch(){
-		
+	switch(set){
+	case 0: printList(head);
+		break;
+	case 1: add
 	}
 }
 
