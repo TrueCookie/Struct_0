@@ -28,6 +28,7 @@ User* fillUser(int &vacant_id);
 User* fillUserRand(int &vacant_id);
 void addAtEnd(User** first, User* nUser);
 void addAtBegin(User** root, User* nUser);
+void add_set(User* head, int global_id);
 User* reverse(User* x);	
 User* deleteUser(User* head, User* someUser);
 void insert(User** head, User* next_User, User* prev_User);
@@ -37,6 +38,7 @@ User* search_f_name(User* user);
 User* search_s_name(User* user);
 User* search_age(User* user);
 User* search_brday(User* user);
+void action_set(User* head, int global_id);
 
 
 int main() {
@@ -48,21 +50,9 @@ int main() {
 	int g_id = 1200;
 
 
-	for (int i = 0; i < 3; i++) {
-		addAtEnd(&head, createUserRand(g_id));
+	while (1) {
+		action_set(head, g_id);
 	}
-
-	printList(head);
-
-	addAtEnd(&head, createUserRand(g_id));
-	insert(&head, head, createUserRand(g_id));
-	addAtBegin(&head, createUserRand(g_id));
-
-	//deleteUser(head, search_set(head));
-
-	printList(head);
-
-	printUser(search_set(head));
 
 	_getch();
 	return 0;
@@ -143,17 +133,35 @@ User* createUserRand(int &vacant_id) {
 }
 
 void add_set(User* head, int global_id) {
-	int set = 0;
-	cout << "1-Добавить в начало / 2-Добавить в конец / 3-Добавить перед ячейкой ";
-	cout << "Введите вариант добавления: ";
 	
-	switch (set) {
+	cout << endl << "1-Добавить имитированного пользователя / 2-Добавть нового пользователя " << endl;
+	cout << "Введите вариант пользователя: ";
+	int set1 = 0;
+	cin >> set1;
+
+	cout << endl << "1-Добавить в начало / 2-Добавить в конец / 3-Добавить перед ячейкой " << endl;
+	cout << "Введите вариант добавления: ";
+	int set2 = 0;
+	cin >> set2;
+	
+	if (set1 == 1) {
+		switch (set2) {
 		case 1: addAtBegin(&head, createUserRand(global_id));
 			break;
 		case 2: addAtEnd(&head, createUserRand(global_id));
 			break;
-		case 3: insert(&head, search_set(), createUserRand(global_id));
+		case 3: insert(&head, search_set(head), createUserRand(global_id));
 			break;
+		}
+	}else if (set1 == 2) {
+		switch (set2) {
+		case 1: addAtBegin(&head, createUser(global_id));
+			break;
+		case 2: addAtEnd(&head, createUser(global_id));
+			break;
+		case 3: insert(&head, search_set(head), createUser(global_id));
+			break;
+		}
 	}
 }
 	
@@ -187,7 +195,6 @@ void insert(User** head, User* next_User, User* prev_User) { // insert new User 
 		tmp->next = prev_User;
 	}
 }
-
 
 User* deleteUser(User* head, User* someUser) {
 
@@ -241,7 +248,7 @@ User* search_set(User* user) {
 
 User* search_id(User* user) {
 
-	user = nullptr;
+	//user = nullptr;  WWTF?
 
 	cout << "Введите id: ";
 	int val;
@@ -299,16 +306,10 @@ User* search_brday(User* user) {
 	return user;
 }
 
-//void menu() {
-//	int choose = 0;
-//	cout << "Введите параметр поиска: ";
-//}
 
-
-
-void action_set(User* head) {
-	cout << " 0-Показать список / 1-Добавить нового пользователя / 2-Удалить пользователя  / 3-Добавить рандомного пользователя /" << endl
-		 << " 4-Сортировать список / 5-Загрузить список / 6-Сохранить список в файл /  " << endl;
+void action_set(User* head, int global_id) {
+	cout << " 0-Показать список / 1-Добавить нового пользователя / 2-Удалить пользователя /" << endl
+		 << " 3-Сортировать список / 4-Загрузить список / 5-Сохранить список в файл / 6-Выход " << endl;
 	cout << "Введите параметр поиска: ";
 	int set;
 	cin >> set;
@@ -316,7 +317,10 @@ void action_set(User* head) {
 	switch(set){
 	case 0: printList(head);
 		break;
-	case 1: add
+	case 1: add_set(head, global_id);
+		break;
+	case 2: deleteUser(head, search_set(head));
+		break;
 	}
 }
 
