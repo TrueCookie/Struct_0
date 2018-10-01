@@ -38,6 +38,7 @@ User* search_f_name(User* user);
 User* search_s_name(User* user);
 User* search_age(User* user);
 User* search_brday(User* user);
+void selection_sort(User* head);
 void action_set(User** head, int global_id);
 
 
@@ -49,6 +50,9 @@ int main() {
 	User* head = nullptr;
 	int g_id = 1200;
 
+	for (int i = 0; i < 6; i++) {
+		addAtEnd(&head, createUserRand(g_id));
+	}
 
 	while (1) {
 		action_set(&head, g_id);
@@ -321,10 +325,32 @@ void action_set(User** head, int global_id) {
 		break;
 	case 2: deleteUser(*head, search_set(*head));
 		break;
+	case 3: selection_sort(*head);
 	}
 }
 
-
+void selection_sort(User* head) {
+	User* tmp1 = head;			//перва€ сравниваема€ €чейка
+	User* tmp2 = head->next;	//втора€ сравниваема€ €чейка
+	User* tmp3 = new User;
+	User* min = new User;
+		min->first_name = "€€€€€€€€€€€";
+	while (tmp1->next != NULL) {
+		while (tmp2->next != NULL) {
+			tmp2 = tmp2->next;
+			if (tmp2->first_name < min->first_name) {
+				min->first_name = tmp2->first_name;
+			}
+		}
+		if (min->first_name < tmp1->first_name) {
+			tmp3->first_name = tmp1->first_name;
+			tmp1->first_name = min->first_name;
+			min->first_name = tmp3->first_name;
+		}
+		tmp1 = tmp1->next;
+		tmp2 = tmp1->next;
+	}
+}
 
 
 
