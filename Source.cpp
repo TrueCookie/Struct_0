@@ -380,7 +380,15 @@ void selection_sort_age(User* head) {
 
 	User* tmp3 = new User;
 
+	User* step1 = new User;
+	User* step2 = new User;
+
 	while (tmp1_ptr->next->next != NULL) {
+
+		step1 = tmp1_ptr;
+		step2 = tmp2_ptr;
+
+
 		min = new User;
 		min->age = INT_MAX;
 
@@ -412,12 +420,16 @@ void selection_sort_age(User* head) {
 			tmp2_ptr->next = tmp3;
 			if (tmp1_ptr != head) {
 				tmp1_prev->next = tmp2_ptr;	//обмен поля next элементов перед первым и вторым обмениваемым элементом
+			}else if (tmp1_ptr == head) {
+				head = tmp2_ptr;
 			}
 			tmp2_prev->next = tmp1_ptr;
 		}
 		printList(head);
 
-			tmp1_ptr = tmp1_ptr->next;	//переход на следующий шаг в цикле
-			tmp2_ptr = tmp1_ptr->next;
+		//tmp1_ptr = tmp1_ptr->next;	//переход на следующий шаг в цикле
+		//tmp2_ptr = tmp1_ptr->next;
+		tmp1_ptr = step1->next;
+		tmp2_ptr = step1->next;
 	}
 }
