@@ -388,7 +388,7 @@ void selection_sort_age(User* head) {
 
 	int count = 0;
 
-	while (step2->next != NULL) {
+	while (step2 != NULL) {
 
 		//step1 = tmp1_ptr;
 		//step2 = tmp2_ptr;
@@ -409,35 +409,45 @@ void selection_sort_age(User* head) {
 		}
 		tmp2_ptr = min;
 
+		if (tmp1_ptr != head) {
+			while (tmp1_prev->next != tmp1_ptr) {//ищем элемент перед первым обмениваемым элементом
+				tmp1_prev = tmp1_prev->next;
+			}
+		}
+		while (tmp2_prev->next != tmp2_ptr) {//ищем элемент перед вторым обмениваемым элементом
+			tmp2_prev = tmp2_prev->next;
+		}
+
+
 		if (tmp1_ptr->age > tmp2_ptr->age) {//обмен элементов местами
 
-			if (tmp1_ptr != head) {
-				while (tmp1_prev->next != tmp1_ptr) {//ищем элемент перед первым обмениваемым элементом
-					tmp1_prev = tmp1_prev->next;
-				}
-			}
-			while (tmp2_prev->next != tmp2_ptr) {//ищем элемент перед вторым обмениваемым элементом
-				tmp2_prev = tmp2_prev->next;
-			}
 			
-			if (tmp1_ptr->next != tmp2_ptr) {
-				tmp3 = tmp1_ptr->next;			//обмен поля next обменяемых элементов
-				tmp1_ptr->next = tmp2_ptr->next;
-				tmp2_ptr->next = tmp3;
-			}else if (tmp1_ptr->next == tmp2_ptr) {
+			if (tmp1_ptr == tmp2_prev && tmp1_ptr != head) {
 				tmp1_ptr->next = tmp2_ptr->next;
 				tmp2_ptr->next = tmp1_ptr;
-			}
-			if (tmp1_ptr != head) {
-				tmp1_prev->next = tmp2_ptr;	//обмен поля next элементов перед первым и вторым обмениваемым элементом
-			}else if (tmp1_ptr == head) {
+
+				tmp1_prev->next = tmp2_ptr;
+			}else if(tmp1_ptr == tmp2_prev && tmp1_ptr == head){
+				tmp1_ptr->next = tmp2_ptr->next;
+				tmp2_ptr->next = tmp1_ptr;
+
+				head = tmp2_ptr;
+			}else if (tmp1_ptr != tmp2_prev && tmp1_ptr != head) {
+				tmp3 = tmp1_ptr->next;			
+				tmp1_ptr->next = tmp2_ptr->next;
+				tmp2_ptr->next = tmp3;
+
+				tmp1_prev->next = tmp2_ptr;
+				tmp2_prev->next = tmp1_ptr;
+			}else if (tmp1_ptr != tmp2_prev && tmp1_ptr == head) {
+				tmp3 = tmp1_ptr->next;
+				tmp1_ptr->next = tmp2_ptr->next;
+				tmp2_ptr->next = tmp3;
+
+				tmp2_prev->next = tmp1_ptr;
 				head = tmp2_ptr;
 			}
-			if (tmp2_prev->next != tmp1_ptr) {
-				tmp2_prev->next = tmp1_ptr; //если они не рядом
-			}else if(tmp1_ptr != head) {
-				tmp1_prev->next = tmp2_ptr; //если они рядом
-			}
+			
 			
 		}
 		printList(head);
