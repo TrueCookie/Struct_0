@@ -374,7 +374,6 @@ void selection_sort_age(User* head) {
 
 	User* step1 = new User;
 	User* step2 = new User;
-
 	step1 = head;
 	step2 = head->next;
 
@@ -383,24 +382,15 @@ void selection_sort_age(User* head) {
 
 	User* tmp1_prev = new User;
 	User* tmp2_prev = new User;
-
 	User* tmp3 = new User;
-
 	int count = 0;
 
 	while (step2 != NULL) {
-
-		//step1 = tmp1_ptr;
-		//step2 = tmp2_ptr;
-
-
 		min = new User;
 		min->age = INT_MAX;
-
 		tmp1_prev = head;
 		tmp2_prev = head;
 		tmp3 = NULL;
-		
 		while (tmp2_ptr != NULL) {		//ищем минимальный элемент в неотсортированной части списка
 			if(tmp2_ptr->age < min->age){
 				min = tmp2_ptr;
@@ -408,7 +398,6 @@ void selection_sort_age(User* head) {
 			tmp2_ptr = tmp2_ptr->next;
 		}
 		tmp2_ptr = min;
-
 		if (tmp1_ptr != head) {
 			while (tmp1_prev->next != tmp1_ptr) {//ищем элемент перед первым обмениваемым элементом
 				tmp1_prev = tmp1_prev->next;
@@ -417,11 +406,7 @@ void selection_sort_age(User* head) {
 		while (tmp2_prev->next != tmp2_ptr) {//ищем элемент перед вторым обмениваемым элементом
 			tmp2_prev = tmp2_prev->next;
 		}
-
-
-		if (tmp1_ptr->age > tmp2_ptr->age) {//обмен элементов местами
-
-			
+		if (tmp1_ptr->age > tmp2_ptr->age) {//обмен элементов местами	
 			if (tmp1_ptr == tmp2_prev && tmp1_ptr != head) {
 				tmp1_ptr->next = tmp2_ptr->next;
 				tmp2_ptr->next = tmp1_ptr;
@@ -446,9 +431,7 @@ void selection_sort_age(User* head) {
 
 				tmp2_prev->next = tmp1_ptr;
 				head = tmp2_ptr;
-			}
-			
-			
+			}	
 		}
 		printList(head);
 
@@ -462,4 +445,5 @@ void selection_sort_age(User* head) {
 		tmp1_ptr = step1;
 		tmp2_ptr = step2;
 	}
+	//delete tmp1_ptr, tmp2_ptr, tmp1_prev, tmp2_prev, min, tmp3, step1, step2;
 }
