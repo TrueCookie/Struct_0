@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <Windows.h>
 #include <iomanip>
+#include <ctime>
 
 
 
@@ -38,11 +39,13 @@ User* search_f_name(User* user);
 User* search_s_name(User* user);
 User* search_age(User* user);
 User* search_brday(User* user);
-void selection_sort(User* head);
+void selection_sort_f_name(User* head);
+void selection_sort_age(User* head);
 void action_set(User** head, int global_id);
 
-
 int main() {
+
+	srand(time(0));
 
 	SetConsoleOutputCP(1251);
 	SetConsoleCP(1251);
@@ -53,6 +56,7 @@ int main() {
 	for (int i = 0; i < 6; i++) {
 		addAtEnd(&head, createUserRand(g_id));
 	}
+	printUser(head);
 
 	while (1) {
 		action_set(&head, g_id);
@@ -325,11 +329,11 @@ void action_set(User** head, int global_id) {
 		break;
 	case 2: deleteUser(*head, search_set(*head));
 		break;
-	case 3: selection_sort(*head);
+	case 3: selection_sort_age(*head);
 	}
 }
 
-void selection_sort(User* head) {
+void selection_sort_f_name(User* head) {
 	User* tmp1 = head;			//перва€ сравниваема€ €чейка
 	User* tmp2 = head->next;	//втора€ сравниваема€ €чейка
 	User* tmp3 = new User;
@@ -342,15 +346,78 @@ void selection_sort(User* head) {
 				min->first_name = tmp2->first_name;
 			}
 		}
-		if (min->first_name < tmp1->first_name) {
-			tmp3->first_name = tmp1->first_name;
-			tmp1->first_name = min->first_name;
-			min->first_name = tmp3->first_name;
+		if (min->first_name < tmp1->first_name) { //обмен двух €чеек стека местами
+			User* tmp1_next = new User;	//turn out the circle
+			User* tmp2_next = new User;	//turn out the circle
+			
+			tmp1_next->next = tmp1->next;
+			tmp2_next->next = tmp2->next;
+			
+			tmp3 = tmp1;
+			tmp1 = min;
+			min = tmp3;
+
+			tmp2->next = tmp2_next->next;
+			tmp1->next = tmp1_next->next;
 		}
 		tmp1 = tmp1->next;
 		tmp2 = tmp1->next;
 	}
 }
 
+void selection_sort_age(User* head) {
+	User* tmp1_ptr = new User;
+	User* tmp2_ptr = new User;
 
+	tmp1_ptr = head;
+	tmp2_ptr = head->next;
 
+	User* min = new User;
+	min->age = INT_MAX;
+
+	User* tmp1_prev = new User;
+	User* tmp2_prev = new User;
+
+	User* tmp3 = new User;
+
+	while (tmp1_ptr->next->next != NULL) {
+		min = new User;
+		min->age = INT_MAX;
+
+		tmp1_prev = head;
+		tmp2_prev = head;
+		tmp3 = NULL;
+		
+		while (tmp2_ptr != NULL) {		//ищем минимальный элемент в неотсортированной части списка
+			if(tmp2_ptr->age < min->age){
+				min = tmp2_ptr;
+			}
+			tmp2_ptr = tmp2_ptr->next;
+		}
+		tmp2_ptr = min;
+
+		if (tmp1_ptr->age > tmp2_ptr->age) {//обмен элементов местами
+
+			if (tmp1_ptr != head) {
+				while (tmp1_prev->next != tmp1_ptr) {//ищем элемент перед первым обмениваемым элементом
+					tmp1_prev = tmp1_prev->next;
+				}
+			}
+			while (tmp2_prev->next != tmp2_ptr) {//ищем элемент перед вторым обмениваемым элементом
+				tmp2_prev = tmp2_prev->next;
+			}
+			
+			tmp3 = tmp1_ptr->next;			//обмен пол€ next обмен€емых элементов
+			tmp1_ptr->next = tmp2_ptr->next;
+			tmp2_ptr->next = tmp3;
+			if (tmp1_ptr != head) {
+				tmp1_prev->next = tmp2_ptr;	//обмен пол€ next элементов перед первым и вторым обмениваемым элементом
+			}
+			tmp2_prev->next = tmp1_ptr;
+		}
+		printList(head);
+
+			tmp1_ptr = tmp1_ptr->next;	//переход на следующий шаг в цикле
+			tmp2_ptr = tmp1_ptr->next;
+	}
+}
