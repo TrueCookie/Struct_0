@@ -372,6 +372,12 @@ void selection_sort_age(User* head) {
 	tmp1_ptr = head;
 	tmp2_ptr = head->next;
 
+	User* step1 = new User;
+	User* step2 = new User;
+
+	step1 = head;
+	step2 = head->next;
+
 	User* min = new User;
 	min->age = INT_MAX;
 
@@ -380,13 +386,12 @@ void selection_sort_age(User* head) {
 
 	User* tmp3 = new User;
 
-	User* step1 = new User;
-	User* step2 = new User;
+	int count = 0;
 
-	while (tmp1_ptr->next->next != NULL) {
+	while (step2->next != NULL) {
 
-		step1 = tmp1_ptr;
-		step2 = tmp2_ptr;
+		//step1 = tmp1_ptr;
+		//step2 = tmp2_ptr;
 
 
 		min = new User;
@@ -415,21 +420,36 @@ void selection_sort_age(User* head) {
 				tmp2_prev = tmp2_prev->next;
 			}
 			
-			tmp3 = tmp1_ptr->next;			//обмен поля next обменяемых элементов
-			tmp1_ptr->next = tmp2_ptr->next;
-			tmp2_ptr->next = tmp3;
+			if (tmp1_ptr->next != tmp2_ptr) {
+				tmp3 = tmp1_ptr->next;			//обмен поля next обменяемых элементов
+				tmp1_ptr->next = tmp2_ptr->next;
+				tmp2_ptr->next = tmp3;
+			}else if (tmp1_ptr->next == tmp2_ptr) {
+				tmp1_ptr->next = tmp2_ptr->next;
+				tmp2_ptr->next = tmp1_ptr;
+			}
 			if (tmp1_ptr != head) {
 				tmp1_prev->next = tmp2_ptr;	//обмен поля next элементов перед первым и вторым обмениваемым элементом
 			}else if (tmp1_ptr == head) {
 				head = tmp2_ptr;
 			}
-			tmp2_prev->next = tmp1_ptr;
+			if (tmp2_prev->next != tmp1_ptr) {
+				tmp2_prev->next = tmp1_ptr; //если они не рядом
+			}else if(tmp1_ptr != head) {
+				tmp1_prev->next = tmp2_ptr; //если они рядом
+			}
+			
 		}
 		printList(head);
 
-		//tmp1_ptr = tmp1_ptr->next;	//переход на следующий шаг в цикле
-		//tmp2_ptr = tmp1_ptr->next;
-		tmp1_ptr = step1->next;
-		tmp2_ptr = step1->next;
+		count++;
+		step1 = head;
+		for (int i = 0; i < count; i++) {	//переход на следующий шаг в цикле
+			step1 = step1->next;
+		}
+		step2 = step1->next;
+		
+		tmp1_ptr = step1;
+		tmp2_ptr = step2;
 	}
 }
