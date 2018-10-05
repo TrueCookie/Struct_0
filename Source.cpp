@@ -56,7 +56,7 @@ int main() {
 	for (int i = 0; i < 6; i++) {
 		addAtEnd(&head, createUserRand(g_id));
 	}
-	printUser(head);
+	printList(head);
 
 	while (1) {
 		action_set(&head, g_id);
