@@ -23,15 +23,15 @@ struct User {
 
 void printList(User* first);
 void printUser(User* first);
-User* createUser(int &vacant_id);
-User* createUserRand(int &vacant_id);
-User* fillUser(int &vacant_id);
-User* fillUserRand(int &vacant_id);
+User* createUser(int* vacant_id);
+User* createUserRand(int* vacant_id);
+User* fillUser(int* vacant_id);
+User* fillUserRand(int* vacant_id);
 void addAtEnd(User** first, User* nUser);
 void addAtBegin(User** root, User* nUser);
-void add_set(User** head, int global_id);
+void add_set(User** head, int* global_id);
 User* reverse(User* x);	
-User* deleteUser(User* head, User* someUser);
+void deleteUser(User** head, User* someUser);
 void insert(User** head, User* next_User, User* prev_User);
 User* search_set(User* user);
 User* search_id(User* user);
@@ -41,7 +41,7 @@ User* search_age(User* user);
 User* search_brday(User* user);
 void selection_sort_f_name(User* head);
 void selection_sort_age(User** head);
-void action_set(User* head, int global_id);
+void action_set(User** head, int* global_id);
 
 int main() {
 
@@ -54,12 +54,12 @@ int main() {
 	int g_id = 1200;
 
 	for (int i = 0; i < 6; i++) {
-		addAtEnd(&head, createUserRand(g_id));
+		addAtEnd(&head, createUserRand(&g_id));
 	}
 	printList(head);
 
 	while (1) {
-		action_set(head, g_id);
+		action_set(&head, &g_id);
 	}
 
 	_getch();
@@ -94,7 +94,7 @@ void printUser(User* first){
 	}
 }
 
-User* fillUser(int &vacant_id) {
+User* fillUser(int* vacant_id) {
 	User* tmpUser = new User;
 	std::cout << "First name: ";  std::cin.ignore(1); ::cin.getline(tmpUser->first_name, 32);
 	std::cout << "Second name: "; std::cin.getline(tmpUser->second_name, 32);
@@ -102,14 +102,14 @@ User* fillUser(int &vacant_id) {
 	std::cout << "day: ";    std::cin >> tmpUser->date[0];
 	std::cout << "mounth: "; std::cin >> tmpUser->date[1];
 	std::cout << "year: ";   std::cin >> tmpUser->date[2];
-	vacant_id++;
-	tmpUser->id = vacant_id;	
+	(*vacant_id)++;
+	tmpUser->id = *vacant_id;	
 	tmpUser->next = nullptr;
 
 	return tmpUser;
 }
 
-User* fillUserRand(int &vacant_id) {
+User* fillUserRand(int* vacant_id) {
 
 	const char* f_names[] = { "Иван", "Сергей", "Дмитрий", "Александр", "Арсений", "Данил", "Михаил", "Илья" };
 	const char* s_names[] = { "Смирнов", "Иванов", "Кузнецов", "Соколов", "Попов", "Лебедев", "Алексеев", "Орлов" };
@@ -121,25 +121,25 @@ User* fillUserRand(int &vacant_id) {
 		tmpUser->date[0] = rand() % 30 + 1;
 		tmpUser->date[1] = rand() % 12 + 1;
 		tmpUser->date[2] = 2018 - tmpUser->age;
-	vacant_id++;
-	tmpUser->id = vacant_id;
+	(*vacant_id)++;
+	tmpUser->id = *vacant_id;
 		tmpUser->next = nullptr;
 	return tmpUser;
 }
 
-User* createUser(int &vacant_id) {
+User* createUser(int* vacant_id) {
 	User * nUser = new User;
 	nUser = fillUser(vacant_id);
 	return nUser;
 }
 
-User* createUserRand(int &vacant_id) {
+User* createUserRand(int* vacant_id) {
 	User * nUser = new User;
 	nUser = fillUserRand(vacant_id);
 	return nUser;
 }
 
-void add_set(User** head, int global_id) {
+void add_set(User** head, int* global_id) {
 	
 	cout << endl << "1-Добавить имитированного пользователя / 2-Добавть нового пользователя " << endl;
 	cout << "Введите вариант пользователя: ";
@@ -203,15 +203,15 @@ void insert(User** head, User* next_User, User* prev_User) { // insert new User 
 	}
 }
 
-User* deleteUser(User* head, User* someUser) {
+void deleteUser(User** head, User* someUser) {
 
 	if (someUser != nullptr) {
-		if (someUser == head) {
-			head = head->next;
+		if (someUser == *head) {
+			*head = (*head)->next;
 			delete someUser;
 		}
 		else {
-			User* tmp = head;
+			User* tmp = *head;
 			while (tmp->next != someUser) {
 				tmp = tmp->next;
 			}
@@ -219,7 +219,6 @@ User* deleteUser(User* head, User* someUser) {
 			delete someUser;
 		}
 	}
-	return head;
 }
 
 User* reverse(User* x) {
@@ -313,7 +312,7 @@ User* search_brday(User* user) {
 	return user;
 }
 
-void action_set(User* head, int global_id) {
+void action_set(User** head, int* global_id) {
 	cout << endl << " 0-Показать список / 1-Добавить нового пользователя / 2-Удалить пользователя /" << endl
 		 << " 3-Сортировать список / 4-Загрузить список / 5-Сохранить список в файл / 6-Выход " << endl;
 	cout << "Выберите действие: ";
@@ -321,13 +320,13 @@ void action_set(User* head, int global_id) {
 	cin >> set;
 
 	switch(set){
-	case 0: printList(head);
+	case 0: printList(*head);
 		break;
-	case 1: add_set(&head, global_id);
+	case 1: add_set(head, global_id);
 		break;
-	case 2: deleteUser(head, search_set(head));
+	case 2: deleteUser(head, search_set(*head));
 		break;
-	case 3: selection_sort_age(&head);
+	case 3: selection_sort_age(head);
 	}
 }
 
