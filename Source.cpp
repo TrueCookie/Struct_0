@@ -112,7 +112,7 @@ User* fillUser(int &vacant_id) {
 
 User* fillUserRand(int &vacant_id) {
 
-	const char* f_names[] = { "Иван", "Сергей", "Дмитрий", "Александр", "Арсений", "Данил", "Михаил", "Кристина" };
+	const char* f_names[] = { "Иван", "Сергей", "Дмитрий", "Александр", "Арсений", "Данил", "Михаил", "Илья" };
 	const char* s_names[] = { "Смирнов", "Иванов", "Кузнецов", "Соколов", "Попов", "Лебедев", "Алексеев", "Орлов" };
 
 	User* tmpUser = new User;
@@ -175,10 +175,10 @@ void add_set(User** head, int global_id) {
 	
 void addAtEnd(User** first, User* nUser) {
 	User* temp = *first;
-	if (temp == nullptr) {
+	if (temp == NULL) {
 		*first = nUser;
 	}else {
-		while (temp->next != nullptr) {
+		while (temp->next != NULL) {
 			temp = temp->next;
 		}
 		temp->next = nUser;
@@ -314,7 +314,6 @@ User* search_brday(User* user) {
 	return user;
 }
 
-
 void action_set(User** head, int global_id) {
 	cout << endl << " 0-Показать список / 1-Добавить нового пользователя / 2-Удалить пользователя /" << endl
 		 << " 3-Сортировать список / 4-Загрузить список / 5-Сохранить список в файл / 6-Выход " << endl;
@@ -445,5 +444,5 @@ void selection_sort_age(User* head) {
 		tmp1_ptr = step1;
 		tmp2_ptr = step2;
 	}
-	//delete tmp1_ptr, tmp2_ptr, tmp1_prev, tmp2_prev, min, tmp3, step1, step2;
 }
+
