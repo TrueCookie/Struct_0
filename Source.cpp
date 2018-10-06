@@ -7,6 +7,7 @@
 #include <Windows.h>
 #include <iomanip>
 #include <ctime>
+#include <fstream>
 
 
 
@@ -42,6 +43,8 @@ User* search_brday(User* user);
 void selection_sort_f_name(User* head);
 void selection_sort_age(User** head);
 void action_set(User** head, int* global_id);
+void fromTextFile(User** head, int* vacant_id);
+
 
 int main() {
 
@@ -62,8 +65,8 @@ int main() {
 		action_set(&head, &g_id);
 	}
 
-	_getch();
-	return 0;
+	//_getch();
+	//return 0;
 }
 
 void printList(User* first) {
@@ -327,6 +330,11 @@ void action_set(User** head, int* global_id) {
 	case 2: deleteUser(head, search_set(*head));
 		break;
 	case 3: selection_sort_age(head);
+		break;
+	case 4: fromTextFile(head, global_id);
+		break;
+	case 6: TerminateProcess(GetCurrentProcess(), 0);
+		break;
 	}
 }
 
@@ -441,5 +449,29 @@ void selection_sort_age(User** head) {
 		tmp1_ptr = step1;
 		tmp2_ptr = step2;
 	}
+}
+
+void fromTextFile(User** head, int* vacant_id) {
+	fstream in;
+	in.open("AddList.txt");
+	if (!in) {
+		cout << "ERROR: no such file or directory ";
+	}
+
+	User* nUser = new User;
+	char* f_name = new char[32];
+	char* s_name = new char[32];
+	while (in >> f_name >> s_name >> nUser->age >> nUser->date[0] >> nUser->date[1] >> nUser->date[2]) {
+		(*vacant_id)++;
+		nUser->id = *vacant_id;
+		strcpy(nUser->first_name, f_name);
+		strcpy(nUser->second_name, s_name);
+
+		nUser->next = nullptr;
+		
+		addAtEnd(head, nUser);
+
+	}
+	in.close();
 }
 
