@@ -40,8 +40,8 @@ User* search_s_name(User* user);
 User* search_age(User* user);
 User* search_brday(User* user);
 void selection_sort_f_name(User* head);
-void selection_sort_age(User* head);
-void action_set(User** head, int global_id);
+void selection_sort_age(User** head);
+void action_set(User* head, int global_id);
 
 int main() {
 
@@ -59,7 +59,7 @@ int main() {
 	printList(head);
 
 	while (1) {
-		action_set(&head, g_id);
+		action_set(head, g_id);
 	}
 
 	_getch();
@@ -96,8 +96,7 @@ void printUser(User* first){
 
 User* fillUser(int &vacant_id) {
 	User* tmpUser = new User;
-
-	std::cout << "First name: ";  std::cin.getline(tmpUser->first_name, 32);
+	std::cout << "First name: ";  std::cin.ignore(1); ::cin.getline(tmpUser->first_name, 32);
 	std::cout << "Second name: "; std::cin.getline(tmpUser->second_name, 32);
 	std::cout << "Age: "; std::cin >> tmpUser->age;
 	std::cout << "day: ";    std::cin >> tmpUser->date[0];
@@ -314,7 +313,7 @@ User* search_brday(User* user) {
 	return user;
 }
 
-void action_set(User** head, int global_id) {
+void action_set(User* head, int global_id) {
 	cout << endl << " 0-Показать список / 1-Добавить нового пользователя / 2-Удалить пользователя /" << endl
 		 << " 3-Сортировать список / 4-Загрузить список / 5-Сохранить список в файл / 6-Выход " << endl;
 	cout << "Выберите действие: ";
@@ -322,13 +321,13 @@ void action_set(User** head, int global_id) {
 	cin >> set;
 
 	switch(set){
-	case 0: printList(*head);
+	case 0: printList(head);
 		break;
-	case 1: add_set(head, global_id);
+	case 1: add_set(&head, global_id);
 		break;
-	case 2: deleteUser(*head, search_set(*head));
+	case 2: deleteUser(head, search_set(head));
 		break;
-	case 3: selection_sort_age(*head);
+	case 3: selection_sort_age(&head);
 	}
 }
 
@@ -364,17 +363,17 @@ void selection_sort_f_name(User* head) {
 	}
 }
 
-void selection_sort_age(User* head) {
+void selection_sort_age(User** head) {
 	User* tmp1_ptr = new User;
 	User* tmp2_ptr = new User;
 
-	tmp1_ptr = head;
-	tmp2_ptr = head->next;
+	tmp1_ptr = *head;
+	tmp2_ptr = (*head)->next;
 
 	User* step1 = new User;
 	User* step2 = new User;
-	step1 = head;
-	step2 = head->next;
+	step1 = *head;
+	step2 = (*head)->next;
 
 	User* min = new User;
 	min->age = INT_MAX;
@@ -387,8 +386,8 @@ void selection_sort_age(User* head) {
 	while (step2 != NULL) {
 		min = new User;
 		min->age = INT_MAX;
-		tmp1_prev = head;
-		tmp2_prev = head;
+		tmp1_prev = *head;
+		tmp2_prev = *head;
 		tmp3 = NULL;
 		while (tmp2_ptr != NULL) {		//ищем минимальный элемент в неотсортированной части списка
 			if(tmp2_ptr->age < min->age){
@@ -397,7 +396,7 @@ void selection_sort_age(User* head) {
 			tmp2_ptr = tmp2_ptr->next;
 		}
 		tmp2_ptr = min;
-		if (tmp1_ptr != head) {
+		if (tmp1_ptr != *head) {
 			while (tmp1_prev->next != tmp1_ptr) {//ищем элемент перед первым обмениваемым элементом
 				tmp1_prev = tmp1_prev->next;
 			}
@@ -406,36 +405,35 @@ void selection_sort_age(User* head) {
 			tmp2_prev = tmp2_prev->next;
 		}
 		if (tmp1_ptr->age > tmp2_ptr->age) {//обмен элементов местами	
-			if (tmp1_ptr == tmp2_prev && tmp1_ptr != head) {
+			if (tmp1_ptr == tmp2_prev && tmp1_ptr != *head) {
 				tmp1_ptr->next = tmp2_ptr->next;
 				tmp2_ptr->next = tmp1_ptr;
 
 				tmp1_prev->next = tmp2_ptr;
-			}else if(tmp1_ptr == tmp2_prev && tmp1_ptr == head){
+			}else if(tmp1_ptr == tmp2_prev && tmp1_ptr == *head){
 				tmp1_ptr->next = tmp2_ptr->next;
 				tmp2_ptr->next = tmp1_ptr;
 
-				head = tmp2_ptr;
-			}else if (tmp1_ptr != tmp2_prev && tmp1_ptr != head) {
+				*head = tmp2_ptr;
+			}else if (tmp1_ptr != tmp2_prev && tmp1_ptr != *head) {
 				tmp3 = tmp1_ptr->next;			
 				tmp1_ptr->next = tmp2_ptr->next;
 				tmp2_ptr->next = tmp3;
 
 				tmp1_prev->next = tmp2_ptr;
 				tmp2_prev->next = tmp1_ptr;
-			}else if (tmp1_ptr != tmp2_prev && tmp1_ptr == head) {
+			}else if (tmp1_ptr != tmp2_prev && tmp1_ptr == *head) {
 				tmp3 = tmp1_ptr->next;
 				tmp1_ptr->next = tmp2_ptr->next;
 				tmp2_ptr->next = tmp3;
 
 				tmp2_prev->next = tmp1_ptr;
-				head = tmp2_ptr;
+				*head = tmp2_ptr;
 			}	
 		}
-		printList(head);
 
 		count++;
-		step1 = head;
+		step1 = *head;
 		for (int i = 0; i < count; i++) {	//переход на следующий шаг в цикле
 			step1 = step1->next;
 		}
