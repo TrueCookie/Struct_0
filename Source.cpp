@@ -48,7 +48,7 @@ void fromTextFile(User** head, int* vacant_id);
 
 int main() {
 
-	srand(time(0));
+	srand(time(nullptr));
 
 	SetConsoleOutputCP(1251);
 	SetConsoleCP(1251);
@@ -72,10 +72,10 @@ int main() {
 void printList(User* first) {
 	User* temp = first;
 	
-	cout << "ID" << setw(11) << "»м€" << setw(9) << "‘амили€" << setw(13) << "ѕолных лет" << setw(15) << "ƒата рождени€" << endl;
+	cout << "ID" << setw(12) << "»м€" << setw(12) << "‘амили€" << setw(13) << "ѕолных лет" << setw(15) << "ƒата рождени€" << endl;
 
 	while (temp != nullptr) {
-		std::cout << temp->id << setw(11) << temp->first_name << setw(9) << temp->second_name << setw(10) << temp->age << setw(9);
+		std::cout << temp->id << setw(12) << temp->first_name << setw(12) << temp->second_name << setw(10) << temp->age << setw(9);
 		std::cout << temp->date[0] << "." << temp->date[1] << "." << temp->date[2] << std::endl;
 
 		temp = temp->next;
@@ -343,7 +343,7 @@ void selection_sort_f_name(User* head) {
 	User* tmp2 = head->next;	//втора€ сравниваема€ €чейка
 	User* tmp3 = new User;
 	User* min = new User;
-		min->first_name = "€€€€€€€€€€€";
+	strcpy(min->first_name, "€€€€€€€€€€€");
 	while (tmp1->next != NULL) {
 		while (tmp2->next != NULL) {
 			tmp2 = tmp2->next;
@@ -453,15 +453,40 @@ void selection_sort_age(User** head) {
 
 void fromTextFile(User** head, int* vacant_id) {
 	fstream in;
-	in.open("AddList.txt");
+	
+	in.open("D:\\EDU\\ProgLang2_Silence\\Struct_0\\Struct_0\\AddList.txt");
 	if (!in) {
 		cout << "ERROR: no such file or directory ";
 	}
 
-	User* nUser = new User;
-	char* f_name = new char[32];
-	char* s_name = new char[32];
-	while (in >> f_name >> s_name >> nUser->age >> nUser->date[0] >> nUser->date[1] >> nUser->date[2]) {
+	int count_lines = 0;
+	char* lines = new char[256];
+	while (in) {
+		std::cin.getline(lines, 64);
+		count_lines++;
+		
+	}in.close();
+
+	char** f_name = new char*[count_lines];
+	char** s_name = new char*[count_lines];
+
+	fstream in2;
+	in2.open("D:\\EDU\\ProgLang2_Silence\\Struct_0\\Struct_0\\AddList.txt");
+	
+	for (int line = 0; line < count_lines; line++) {
+		User* nUser = new User;
+		in2 >> *f_name[line] >> *s_name[line] >> nUser->age >> nUser->date[0] >> nUser->date[1] >> nUser->date[2];
+
+		strcpy(nUser->first_name, f_name[line]);
+		strcpy(nUser->second_name, s_name[line]);
+		nUser->next = nullptr;
+
+		addAtEnd(head, nUser);
+	}in2.close();
+
+
+	/*while (in2 >> f_name >> s_name >> nUser->age >> nUser->date[0] >> nUser->date[1] >> nUser->date[2]) 
+	for (int i = 0; i < count_lines; i++) {
 		(*vacant_id)++;
 		nUser->id = *vacant_id;
 		strcpy(nUser->first_name, f_name);
@@ -472,6 +497,6 @@ void fromTextFile(User** head, int* vacant_id) {
 		addAtEnd(head, nUser);
 
 	}
-	in.close();
+	in.close();*/
 }
 
