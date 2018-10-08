@@ -43,7 +43,10 @@ User* search_brday(User* user);
 void selection_sort_f_name(User* head);
 void selection_sort_age(User** head);
 void action_set(User** head, int* global_id);
+void setDownload(User** head, int* vacant_id);
 void fromTextFile(User** head, int* vacant_id);
+void fromBinFile(User** head, int* vacant_id);
+void fromBinFileAlt(User** head, int* vacant_id);
 
 
 int main() {
@@ -331,7 +334,7 @@ void action_set(User** head, int* global_id) {
 		break;
 	case 3: selection_sort_age(head);
 		break;
-	case 4: fromTextFile(head, global_id);
+	case 4: setDownload(head, global_id);
 		break;
 	case 6: TerminateProcess(GetCurrentProcess(), 0);
 		break;
@@ -436,9 +439,8 @@ void selection_sort_age(User** head) {
 
 				tmp2_prev->next = tmp1_ptr;
 				*head = tmp2_ptr;
-			}	
+			}
 		}
-
 		count++;
 		step1 = *head;
 		for (int i = 0; i < count; i++) {	//переход на следующий шаг в цикле
@@ -451,52 +453,106 @@ void selection_sort_age(User** head) {
 	}
 }
 
-void fromTextFile(User** head, int* vacant_id) {
-	fstream in;
-	
-	in.open("D:\\EDU\\ProgLang2_Silence\\Struct_0\\Struct_0\\AddList.txt");
-	if (!in) {
-		cout << "ERROR: no such file or directory ";
+void setDownload(User** head, int* vacant_id) {
+	cout << "“ип загружаемого файла: 1 - .txt / 2 - .bin: " << endl;
+	cout << "¬вод: "; 
+	int set = 1;
+	cin >> set;
+
+	switch (set) {
+	case 1: fromTextFile(head, vacant_id);
+		break;
+	case 2: fromBinFile(head, vacant_id);
+		break;
 	}
 
-	int count_lines = 0;
-	char* lines = new char[256];
-	while (in) {
-		std::cin.getline(lines, 64);
-		count_lines++;
-		
-	}in.close();
+}
 
-	char** f_name = new char*[count_lines];
-	char** s_name = new char*[count_lines];
+void fromTextFile(User** head, int* vacant_id) {
+	fstream in;
 
-	fstream in2;
-	in2.open("D:\\EDU\\ProgLang2_Silence\\Struct_0\\Struct_0\\AddList.txt");
-	
-	for (int line = 0; line < count_lines; line++) {
+	in.open("AddList.txt");
+	if (!in) {
+		cout << "ERROR: no such file or directory " << endl;
+	}
+	char* f_name = new char[32];
+	char* s_name = new char[32];
+
+	int i = 0;
+	int tmp_age = 42, tmp_date[3];
+	while (in >> f_name >> s_name >> tmp_age >> tmp_date[0] >> tmp_date[1] >> tmp_date[2]) {
 		User* nUser = new User;
-		in2 >> *f_name[line] >> *s_name[line] >> nUser->age >> nUser->date[0] >> nUser->date[1] >> nUser->date[2];
 
-		strcpy(nUser->first_name, f_name[line]);
-		strcpy(nUser->second_name, s_name[line]);
-		nUser->next = nullptr;
-
-		addAtEnd(head, nUser);
-	}in2.close();
-
-
-	/*while (in2 >> f_name >> s_name >> nUser->age >> nUser->date[0] >> nUser->date[1] >> nUser->date[2]) 
-	for (int i = 0; i < count_lines; i++) {
+		nUser->age = tmp_age;
+		for (int i = 0; i < 3; i++) {
+			nUser->date[i] = tmp_date[i];
+		}
+		strcpy(nUser->first_name, f_name);
+		strcpy(nUser->second_name, s_name);
+		
 		(*vacant_id)++;
 		nUser->id = *vacant_id;
+
+		nUser->next = nullptr;
+		addAtEnd(head, nUser);
+	}
+	in.close();
+}
+
+void fromBinFile(User** head, int* vacant_id) {
+	fstream in;
+
+	in.open("AddList.bin", ios::binary | ios::in);
+	if (!in) {
+		cout << "ERROR: no such file or directory " << endl;
+	}
+	char* f_name = new char[32];
+	char* s_name = new char[32];
+
+	int i = 0;
+	int tmp_age = 42, tmp_date[3];
+	while (in >> f_name >> s_name >> tmp_age >> tmp_date[0] >> tmp_date[1] >> tmp_date[2]) {
+		User* nUser = new User;
+
+		nUser->age = tmp_age;
+		for (int i = 0; i < 3; i++) {
+			nUser->date[i] = tmp_date[i];
+		}
 		strcpy(nUser->first_name, f_name);
 		strcpy(nUser->second_name, s_name);
 
-		nUser->next = nullptr;
-		
-		addAtEnd(head, nUser);
+		(*vacant_id)++;
+		nUser->id = *vacant_id;
 
+		nUser->next = nullptr;
+		addAtEnd(head, nUser);
 	}
-	in.close();*/
+	in.close();
+}
+
+
+void fromBinFileAlt(User** head, int* vacant_id) {
+	fstream in;
+
+	in.open("AddList.bin", ios::binary|ios::in);
+	if (!in) {
+		cout << "ERROR: no such file or directory " << endl;
+	}
+	char* f_name = new char[32];
+	char* s_name = new char[32];
+
+	int i = 0;
+	int tmp_age = 42, tmp_date[3];
+	User* tmpUser = new User;
+	while (in.read((char*)&tmpUser, 32)) {
+		User* nUser = new User;
+		*nUser = *tmpUser;
+		(*vacant_id)++;
+		nUser->id = *vacant_id;
+
+		nUser->next = nullptr;
+		addAtEnd(head, nUser);
+	}
+	in.close();
 }
 
