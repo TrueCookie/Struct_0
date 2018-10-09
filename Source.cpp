@@ -40,7 +40,8 @@ User* search_f_name(User* user);
 User* search_s_name(User* user);
 User* search_age(User* user);
 User* search_brday(User* user);
-void selection_sort_f_name(User* head);
+void sort_set(User** head);
+void selection_sort_f_name(User** head);
 void selection_sort_age(User** head);
 void action_set(User** head, int* global_id);
 void setDownload(User** head, int* vacant_id);
@@ -116,7 +117,6 @@ User* fillUser(int* vacant_id) {
 }
 
 User* fillUserRand(int* vacant_id) {
-
 	const char* f_names[] = { "»ван", "—ергей", "ƒмитрий", "јлександр", "јрсений", "ƒанил", "ћихаил", "»ль€" };
 	const char* s_names[] = { "—мирнов", "»ванов", " узнецов", "—околов", "ѕопов", "Ћебедев", "јлексеев", "ќрлов" };
 
@@ -146,7 +146,6 @@ User* createUserRand(int* vacant_id) {
 }
 
 void add_set(User** head, int* global_id) {
-	
 	cout << endl << "1-ƒобавить имитированного пользовател€ / 2-ƒобавть нового пользовател€ " << endl;
 	cout << "¬ведите вариант пользовател€: ";
 	int set1 = 0;
@@ -332,7 +331,7 @@ void action_set(User** head, int* global_id) {
 		break;
 	case 2: deleteUser(head, search_set(*head));
 		break;
-	case 3: selection_sort_age(head);
+	case 3: sort_set(head);
 		break;
 	case 4: setDownload(head, global_id);
 		break;
@@ -341,44 +340,29 @@ void action_set(User** head, int* global_id) {
 	}
 }
 
-void selection_sort_f_name(User* head) {
-	User* tmp1 = head;			//перва€ сравниваема€ €чейка
-	User* tmp2 = head->next;	//втора€ сравниваема€ €чейка
-	User* tmp3 = new User;
-	User* min = new User;
-	strcpy(min->first_name, "€€€€€€€€€€€");
-	while (tmp1->next != NULL) {
-		while (tmp2->next != NULL) {
-			tmp2 = tmp2->next;
-			if (tmp2->first_name < min->first_name) {
-				min->first_name = tmp2->first_name;
-			}
-		}
-		if (min->first_name < tmp1->first_name) { //обмен двух €чеек стека местами
-			User* tmp1_next = new User;	//turn out the circle
-			User* tmp2_next = new User;	//turn out the circle
-			
-			tmp1_next->next = tmp1->next;
-			tmp2_next->next = tmp2->next;
-			
-			tmp3 = tmp1;
-			tmp1 = min;
-			min = tmp3;
+void sort_set(User** head) {
+	cout << " 1-id / 2-»м€ / 3-‘амили€ / 4-¬озраст / 5-ƒень –ождени€ " << endl;
+	cout << "¬ведите параметр сортировки: ";
+	int set;
+	cin >> set;
 
-			tmp2->next = tmp2_next->next;
-			tmp1->next = tmp1_next->next;
-		}
-		tmp1 = tmp1->next;
-		tmp2 = tmp1->next;
+	switch (set) {
+	case 1: 
+		break;
+	case 2: selection_sort_f_name(head);
+		break;
+	case 3: 
+		break;
+	case 4: return selection_sort_age(head);
+		break;
+	case 5: 
+		break;
 	}
 }
 
-void selection_sort_age(User** head) {
+void selection_sort_f_name(User** head) {
 	User* tmp1_ptr = new User;
 	User* tmp2_ptr = new User;
-
-	tmp1_ptr = *head;
-	tmp2_ptr = (*head)->next;
 
 	User* step1 = new User;
 	User* step2 = new User;
@@ -386,7 +370,6 @@ void selection_sort_age(User** head) {
 	step2 = (*head)->next;
 
 	User* min = new User;
-	min->age = INT_MAX;
 
 	User* tmp1_prev = new User;
 	User* tmp2_prev = new User;
@@ -394,6 +377,88 @@ void selection_sort_age(User** head) {
 	int count = 0;
 
 	while (step2 != NULL) {
+		tmp1_ptr = step1;
+		tmp2_ptr = step2;
+
+		min = new User;
+		/*1*/min->first_name = "€€€€€€€€€€€€€€";
+		tmp1_prev = *head;
+		tmp2_prev = *head;
+		tmp3 = NULL;
+		while (tmp2_ptr != NULL) {		//ищем минимальный элемент в неотсортированной части списка
+			/*1*/if(strcmp(tmp2_ptr->first_name, min->first_name) < 0) {
+				min = tmp2_ptr;
+			}
+			tmp2_ptr = tmp2_ptr->next;
+		}
+		tmp2_ptr = min;
+		if (tmp1_ptr != *head) {
+			while (tmp1_prev->next != tmp1_ptr) {//ищем элемент перед первым обмениваемым элементом
+				tmp1_prev = tmp1_prev->next;
+			}
+		}
+		while (tmp2_prev->next != tmp2_ptr) {//ищем элемент перед вторым обмениваемым элементом
+			tmp2_prev = tmp2_prev->next;
+		}
+		/*1*/if (strcmp(tmp1_ptr->first_name, tmp2_ptr->first_name) > 0) {//обмен элементов местами	
+			if (tmp1_ptr == tmp2_prev && tmp1_ptr != *head) {
+				tmp1_ptr->next = tmp2_ptr->next;
+				tmp2_ptr->next = tmp1_ptr;
+
+				tmp1_prev->next = tmp2_ptr;
+			}
+			else if (tmp1_ptr == tmp2_prev && tmp1_ptr == *head) {
+				tmp1_ptr->next = tmp2_ptr->next;
+				tmp2_ptr->next = tmp1_ptr;
+
+				*head = tmp2_ptr;
+			}
+			else if (tmp1_ptr != tmp2_prev && tmp1_ptr != *head) {
+				tmp3 = tmp1_ptr->next;
+				tmp1_ptr->next = tmp2_ptr->next;
+				tmp2_ptr->next = tmp3;
+
+				tmp1_prev->next = tmp2_ptr;
+				tmp2_prev->next = tmp1_ptr;
+			}
+			else if (tmp1_ptr != tmp2_prev && tmp1_ptr == *head) {
+				tmp3 = tmp1_ptr->next;
+				tmp1_ptr->next = tmp2_ptr->next;
+				tmp2_ptr->next = tmp3;
+
+				tmp2_prev->next = tmp1_ptr;
+				*head = tmp2_ptr;
+			}
+		}
+		count++;
+		step1 = *head;
+		for (int i = 0; i < count; i++) {	//переход на следующий шаг в цикле
+			step1 = step1->next;
+		}
+		step2 = step1->next;
+	}
+}
+
+void selection_sort_age(User** head) {
+	User* tmp1_ptr = new User;
+	User* tmp2_ptr = new User;
+
+	User* step1 = new User;
+	User* step2 = new User;
+	step1 = *head;
+	step2 = (*head)->next;
+
+	User* min = new User;
+
+	User* tmp1_prev = new User;
+	User* tmp2_prev = new User;
+	User* tmp3 = new User;
+	int count = 0;
+
+	while (step2 != NULL) {
+		tmp1_ptr = step1;
+		tmp2_ptr = step2;
+
 		min = new User;
 		min->age = INT_MAX;
 		tmp1_prev = *head;
@@ -447,9 +512,6 @@ void selection_sort_age(User** head) {
 			step1 = step1->next;
 		}
 		step2 = step1->next;
-		
-		tmp1_ptr = step1;
-		tmp2_ptr = step2;
 	}
 }
 
@@ -529,7 +591,6 @@ void fromBinFile(User** head, int* vacant_id) {
 	}
 	in.close();
 }
-
 
 void fromBinFileAlt(User** head, int* vacant_id) {
 	fstream in;
