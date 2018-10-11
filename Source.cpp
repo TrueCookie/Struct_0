@@ -16,6 +16,7 @@ struct User {
 	char* second_name = new char[32];
 	int age;
 	int* date = new int[3];
+	int salary;
 	int id;
 	User* next;
 };
@@ -46,7 +47,7 @@ void fromFile(User** head, int* vacant_id, const char* type);
 void fromBinFileAlt(User** head, int* vacant_id);
 void inFile(User* head, const char* type);
 void selection_sort_shit(User** head, const char* field);
-
+void changeSalary(User** head);
 
 int main() {
 
@@ -74,11 +75,11 @@ int main() {
 void printList(User* first) {
 	User* temp = first;
 	
-	cout << "ID" << setw(12) << "Имя" << setw(12) << "Фамилия" << setw(13) << "Полных лет" << setw(15) << "Дата рождения" << endl;
+	cout << "ID" << setw(12) << "Имя" << setw(12) << "Фамилия" << setw(13) << "Полных лет" << setw(15) << "Дата рождения" << setw(10) << "Оклад" << endl;
 
 	while (temp != nullptr) {
 		std::cout << temp->id << setw(12) << temp->first_name << setw(12) << temp->second_name << setw(10) << temp->age << setw(9);
-		std::cout << temp->date[0] << "." << temp->date[1] << "." << temp->date[2] << std::endl;
+		std::cout << temp->date[0] << "." << temp->date[1] << "." << temp->date[2] << setw(10) << temp->salary << std::endl;
 
 		temp = temp->next;
 	}
@@ -88,10 +89,10 @@ void printList(User* first) {
 void printUser(User* first){
 	User* temp = first;
 	if (temp != nullptr) {
-		cout << "ID" << setw(11) << "Имя" << setw(9) << "Фамилия" << setw(13) << "Полных лет" << setw(15) << "Дата рождения" << endl;
+		cout << "ID" << setw(11) << "Имя" << setw(9) << "Фамилия" << setw(13) << "Полных лет" << setw(15) << "Дата рождения" << setw(10) << "Оклад" << endl;
 
 		std::cout << temp->id << setw(11) << temp->first_name << setw(9) << temp->second_name << setw(10) << temp->age << setw(9);
-		std::cout << temp->date[0] << "." << temp->date[1] << "." << temp->date[2] << std::endl;
+		std::cout << temp->date[0] << "." << temp->date[1] << "." << temp->date[2] << setw(10) << temp->salary << std::endl;
 
 		std::cout << std::endl;
 	}else {
@@ -101,12 +102,13 @@ void printUser(User* first){
 
 User* fillUser(int* vacant_id) {
 	User* tmpUser = new User;
-	std::cout << "First name: ";  std::cin.ignore(1); ::cin.getline(tmpUser->first_name, 32);
-	std::cout << "Second name: "; std::cin.getline(tmpUser->second_name, 32);
-	std::cout << "Age: "; std::cin >> tmpUser->age;
-	std::cout << "day: ";    std::cin >> tmpUser->date[0];
-	std::cout << "mounth: "; std::cin >> tmpUser->date[1];
-	std::cout << "year: ";   std::cin >> tmpUser->date[2];
+	std::cout << "Имя: ";  std::cin.ignore(1); ::cin.getline(tmpUser->first_name, 32);
+	std::cout << "Фамилия: "; std::cin.getline(tmpUser->second_name, 32);
+	std::cout << "Возраст: "; std::cin >> tmpUser->age;
+	std::cout << "День: ";    std::cin >> tmpUser->date[0];
+	std::cout << "Месяц: "; std::cin >> tmpUser->date[1];
+	std::cout << "Год: ";   std::cin >> tmpUser->date[2];
+	std::cout << "Оклад: ";   std::cin >> tmpUser->salary;
 	(*vacant_id)++;
 	tmpUser->id = *vacant_id;	
 	tmpUser->next = nullptr;
@@ -125,6 +127,7 @@ User* fillUserRand(int* vacant_id) {
 		tmpUser->date[0] = rand() % 30 + 1;
 		tmpUser->date[1] = rand() % 12 + 1;
 		tmpUser->date[2] = 2018 - tmpUser->age;
+	tmpUser->salary = (rand() % 80 + 20)*1000;
 	(*vacant_id)++;
 	tmpUser->id = *vacant_id;
 		tmpUser->next = nullptr;
@@ -317,7 +320,7 @@ User* search_brday(User* user) {
 
 void action_set(User** head, int* global_id) {
 	cout << endl << " 0-Показать список / 1-Добавить нового пользователя / 2-Удалить пользователя /" << endl
-		 << " 3-Сортировать список / 4-Загрузить список / 5-Сохранить список в файл / 6-Выход " << endl;
+		 << " 3-Сортировать список / 4-Загрузить список / 5-Сохранить список в файл / 6-Изменить доклад / 7-Выход " << endl;
 	cout << "Выберите действие: ";
 	int set;
 	cin >> set;
@@ -335,7 +338,9 @@ void action_set(User** head, int* global_id) {
 		break;
 	case 5: setUpload(*head);
 		break;
-	case 6: TerminateProcess(GetCurrentProcess(), 0);
+	case 6: changeSalary(head);
+		break;
+	case 7: TerminateProcess(GetCurrentProcess(), 0);
 		break;
 	}
 }
@@ -576,8 +581,16 @@ void inFile(User* head, const char* type) {
 
 	User* tmp = head;
 	while (tmp != nullptr) {
-		out << tmp->id << " " << tmp->first_name << " " << tmp->second_name << " " << tmp->age << " " << tmp->date[0] << "." << tmp->date[1] << "." << tmp->date[2] << endl;
+		out << tmp->id << " " << tmp->first_name << " " << tmp->second_name << " " << tmp->age << " " << tmp->date[0] << "." << tmp->date[1] << "." << tmp->date[2] << tmp->salary << endl;
 		tmp = tmp->next;
 	}
 	out.close();
+}
+
+void changeSalary(User** head) {
+	User* sub = search_set(*head);
+	printUser(sub);
+	int new_salary = 0;
+	cout << "Введите новый оклад: "; cin >> new_salary;
+	sub->salary = new_salary;
 }
