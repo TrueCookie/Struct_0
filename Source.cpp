@@ -9,8 +9,6 @@
 #include <ctime>
 #include <fstream>
 
-
-
 using namespace std;
 
 struct User {
@@ -41,13 +39,13 @@ User* search_s_name(User* user);
 User* search_age(User* user);
 User* search_brday(User* user);
 void sort_set(User** head);
-void selection_sort_f_name(User** head);
-void selection_sort_age(User** head);
 void action_set(User** head, int* global_id);
 void setDownload(User** head, int* vacant_id);
-void fromTextFile(User** head, int* vacant_id);
-void fromBinFile(User** head, int* vacant_id);
+void setUpload(User* head);
+void fromFile(User** head, int* vacant_id, const char* type);
 void fromBinFileAlt(User** head, int* vacant_id);
+void inFile(User* head, const char* type);
+void selection_sort_shit(User** head, const char* field);
 
 
 int main() {
@@ -335,6 +333,8 @@ void action_set(User** head, int* global_id) {
 		break;
 	case 4: setDownload(head, global_id);
 		break;
+	case 5: setUpload(*head);
+		break;
 	case 6: TerminateProcess(GetCurrentProcess(), 0);
 		break;
 	}
@@ -347,22 +347,20 @@ void sort_set(User** head) {
 	cin >> set;
 
 	switch (set) {
-	case 1: 
+	case 1: selection_sort_shit(head, "id");
 		break;
-	case 2: selection_sort_f_name(head);
+	case 2: selection_sort_shit(head, "first_name");
 		break;
-	case 3: 
+	case 3: selection_sort_shit(head, "second_name");
 		break;
-	case 4: return selection_sort_age(head);
+	case 4: selection_sort_shit(head, "age");
 		break;
-	case 5: 
+	case 5: selection_sort_shit(head, "date");
 		break;
 	}
 }
 
-
-
-void selection_sort_f_name(User** head) {
+void selection_sort_shit(User** head, const char* field) {
 	User* tmp1_ptr = new User;
 	User* tmp2_ptr = new User;
 
@@ -383,14 +381,37 @@ void selection_sort_f_name(User** head) {
 		tmp2_ptr = step2;
 
 		min = new User;
-		/*1*/min->first_name = "€€€€€€€€€€€€€€";
+		if (strcmp(field, "first_name") == 0){
+			/*1*/min->first_name = "€€€€€€€€€€€€€€";
+		}
+		else if (strcmp(field, "second_name") == 0) {
+			min->second_name = "€€€€€€€€€€€€€€";
+		}
+		else if (strcmp(field, "id") == 0) {
+			min->id = 100000;
+		}
+		else if (strcmp(field, "age") == 0) {
+			min->age = 100;
+		}
+		else if (strcmp(field, "date") == 0) {
+			for (int i = 0; i < 3; i++) {
+				min->date[i] = 3000;
+			}
+		}
 		tmp1_prev = *head;
 		tmp2_prev = *head;
 		tmp3 = NULL;
 		while (tmp2_ptr != NULL) {		//ищем минимальный элемент в неотсортированной части списка
-			/*1*/if(strcmp(tmp2_ptr->first_name, min->first_name) < 0) {
-				min = tmp2_ptr;
-			}
+
+			/*1*/if ((strcmp(field, "first_name") == 0 && strcmp(tmp2_ptr->first_name, min->first_name) < 0) ||
+					(strcmp(field, "second_name") == 0 && strcmp(tmp2_ptr->second_name, min->second_name) < 0) ||
+					(strcmp(field, "id") == 0 && tmp2_ptr->id < min->id) || 
+					(strcmp(field, "age") == 0 && tmp2_ptr->age < min->age) ||
+					(strcmp(field, "date") == 0 && (tmp2_ptr->date[2] < min->date[2] || (tmp2_ptr->date[2] == min->date[2] && tmp2_ptr->date[1] < min->date[1]) || (tmp2_ptr->date[2] == min->date[2] && tmp2_ptr->date[1] == min->date[1] && tmp2_ptr->date[0] < min->date[0])))) 
+				{
+					min = tmp2_ptr;
+				}/*2*/
+
 			tmp2_ptr = tmp2_ptr->next;
 		}
 		tmp2_ptr = min;
@@ -402,7 +423,17 @@ void selection_sort_f_name(User** head) {
 		while (tmp2_prev->next != tmp2_ptr) {//ищем элемент перед вторым обмениваемым элементом
 			tmp2_prev = tmp2_prev->next;
 		}
-		/*1*/if (strcmp(tmp1_ptr->first_name, tmp2_ptr->first_name) > 0) {//обмен элементов местами	
+		int flag_super = 0;
+		if ((strcmp(field, "first_name") == 0 && strcmp(tmp2_ptr->first_name, tmp1_ptr->first_name) < 0) ||
+			(strcmp(field, "second_name") == 0 && strcmp(tmp2_ptr->second_name, tmp1_ptr->second_name) < 0) ||
+			(strcmp(field, "id") == 0 && tmp2_ptr->id < tmp1_ptr->id) ||
+			(strcmp(field, "age") == 0 && tmp2_ptr->age < tmp1_ptr->age) ||
+			(strcmp(field, "date") == 0 && (tmp2_ptr->date[2] < tmp1_ptr->date[2] || (tmp2_ptr->date[2] == tmp1_ptr->date[2] && tmp2_ptr->date[1] < tmp1_ptr->date[1]) || (tmp2_ptr->date[2] == tmp1_ptr->date[2] && tmp2_ptr->date[1] == tmp1_ptr->date[1] && tmp2_ptr->date[0] < tmp1_ptr->date[0]))))
+		{
+			flag_super = 1;
+		}
+
+		/*1*/if (flag_super == 1) {//обмен элементов местами	
 			if (tmp1_ptr == tmp2_prev && tmp1_ptr != *head) {
 				tmp1_ptr->next = tmp2_ptr->next;
 				tmp2_ptr->next = tmp1_ptr;
@@ -431,83 +462,7 @@ void selection_sort_f_name(User** head) {
 				tmp2_prev->next = tmp1_ptr;
 				*head = tmp2_ptr;
 			}
-		}
-		count++;
-		step1 = *head;
-		for (int i = 0; i < count; i++) {	//переход на следующий шаг в цикле
-			step1 = step1->next;
-		}
-		step2 = step1->next;
-	}
-}
-
-void selection_sort_age(User** head) {
-	User* tmp1_ptr = new User;
-	User* tmp2_ptr = new User;
-
-	User* step1 = new User;
-	User* step2 = new User;
-	step1 = *head;
-	step2 = (*head)->next;
-
-	User* min = new User;
-
-	User* tmp1_prev = new User;
-	User* tmp2_prev = new User;
-	User* tmp3 = new User;
-	int count = 0;
-
-	while (step2 != NULL) {
-		tmp1_ptr = step1;
-		tmp2_ptr = step2;
-
-		min = new User;
-		min->age = INT_MAX;
-		tmp1_prev = *head;
-		tmp2_prev = *head;
-		tmp3 = NULL;
-		while (tmp2_ptr != NULL) {		//ищем минимальный элемент в неотсортированной части списка
-			if(tmp2_ptr->age < min->age){
-				min = tmp2_ptr;
-			}
-			tmp2_ptr = tmp2_ptr->next;
-		}
-		tmp2_ptr = min;
-		if (tmp1_ptr != *head) {
-			while (tmp1_prev->next != tmp1_ptr) {//ищем элемент перед первым обмениваемым элементом
-				tmp1_prev = tmp1_prev->next;
-			}
-		}
-		while (tmp2_prev->next != tmp2_ptr) {//ищем элемент перед вторым обмениваемым элементом
-			tmp2_prev = tmp2_prev->next;
-		}
-		if (tmp1_ptr->age > tmp2_ptr->age) {//обмен элементов местами	
-			if (tmp1_ptr == tmp2_prev && tmp1_ptr != *head) {
-				tmp1_ptr->next = tmp2_ptr->next;
-				tmp2_ptr->next = tmp1_ptr;
-
-				tmp1_prev->next = tmp2_ptr;
-			}else if(tmp1_ptr == tmp2_prev && tmp1_ptr == *head){
-				tmp1_ptr->next = tmp2_ptr->next;
-				tmp2_ptr->next = tmp1_ptr;
-
-				*head = tmp2_ptr;
-			}else if (tmp1_ptr != tmp2_prev && tmp1_ptr != *head) {
-				tmp3 = tmp1_ptr->next;			
-				tmp1_ptr->next = tmp2_ptr->next;
-				tmp2_ptr->next = tmp3;
-
-				tmp1_prev->next = tmp2_ptr;
-				tmp2_prev->next = tmp1_ptr;
-			}else if (tmp1_ptr != tmp2_prev && tmp1_ptr == *head) {
-				tmp3 = tmp1_ptr->next;
-				tmp1_ptr->next = tmp2_ptr->next;
-				tmp2_ptr->next = tmp3;
-
-				tmp2_prev->next = tmp1_ptr;
-				*head = tmp2_ptr;
-			}
-		}
+		}/*2*/
 		count++;
 		step1 = *head;
 		for (int i = 0; i < count; i++) {	//переход на следующий шаг в цикле
@@ -518,24 +473,43 @@ void selection_sort_age(User** head) {
 }
 
 void setDownload(User** head, int* vacant_id) {
-	cout << "“ип загружаемого файла: 1 - .txt / 2 - .bin: " << endl;
-	cout << "¬вод: "; 
+	cout << " 1 - .txt / 2 - .bin: " << endl;
+	cout << "¬ведите тип загружаемого файла: "; 
 	int set = 1;
 	cin >> set;
 
 	switch (set) {
-	case 1: fromTextFile(head, vacant_id);
+	case 1: fromFile(head, vacant_id, "txt");
 		break;
-	case 2: fromBinFile(head, vacant_id);
+	case 2: fromFile(head, vacant_id, "bin");
 		break;
 	}
 
 }
 
-void fromTextFile(User** head, int* vacant_id) {
-	fstream in;
+void setUpload(User* head) {
+	cout << "1 - .txt / 2 - .bin: " << endl;
+	cout << "¬ведите тип выгружаемого файла: ";
+	int set = 1;
+	cin >> set;
 
-	in.open("AddList.txt");
+	switch (set) {
+	case 1: inFile(head, "txt");
+		break;
+	case 2: inFile(head, "bin");
+		break;
+	}
+
+}
+
+void fromFile(User** head, int* vacant_id, const char* type) {
+	fstream in;
+	
+	if (strcmp(type, "txt") == 0) {
+		in.open("AddList.txt");
+	}else if (strcmp(type, "bin") == 0) {
+		in.open("AddList.bin", ios::binary | ios::in);
+	}
 	if (!in) {
 		cout << "ERROR: no such file or directory " << endl;
 	}
@@ -554,37 +528,6 @@ void fromTextFile(User** head, int* vacant_id) {
 		strcpy(nUser->first_name, f_name);
 		strcpy(nUser->second_name, s_name);
 		
-		(*vacant_id)++;
-		nUser->id = *vacant_id;
-
-		nUser->next = nullptr;
-		addAtEnd(head, nUser);
-	}
-	in.close();
-}
-
-void fromBinFile(User** head, int* vacant_id) {
-	fstream in;
-
-	in.open("AddList.bin", ios::binary | ios::in);
-	if (!in) {
-		cout << "ERROR: no such file or directory " << endl;
-	}
-	char* f_name = new char[32];
-	char* s_name = new char[32];
-
-	int i = 0;
-	int tmp_age = 42, tmp_date[3];
-	while (in >> f_name >> s_name >> tmp_age >> tmp_date[0] >> tmp_date[1] >> tmp_date[2]) {
-		User* nUser = new User;
-
-		nUser->age = tmp_age;
-		for (int i = 0; i < 3; i++) {
-			nUser->date[i] = tmp_date[i];
-		}
-		strcpy(nUser->first_name, f_name);
-		strcpy(nUser->second_name, s_name);
-
 		(*vacant_id)++;
 		nUser->id = *vacant_id;
 
@@ -619,3 +562,22 @@ void fromBinFileAlt(User** head, int* vacant_id) {
 	in.close();
 }
 
+void inFile(User* head, const char* type) {
+	ofstream out;
+	if (strcmp(type, "txt") == 0) {
+		out.open("out.txt", ios::out);
+	}else if (strcmp(type, "bin") == 0) {
+		out.open("out.bin", ios::binary | ios::out);
+	}
+	
+	if (!out) {
+		cout << "ERROR: no such file or directory" << endl;
+	}
+
+	User* tmp = head;
+	while (tmp != nullptr) {
+		out << tmp->id << " " << tmp->first_name << " " << tmp->second_name << " " << tmp->age << " " << tmp->date[0] << "." << tmp->date[1] << "." << tmp->date[2] << endl;
+		tmp = tmp->next;
+	}
+	out.close();
+}
