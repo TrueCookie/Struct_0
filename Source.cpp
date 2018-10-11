@@ -360,6 +360,8 @@ void sort_set(User** head) {
 	}
 }
 
+
+
 void selection_sort_f_name(User** head) {
 	User* tmp1_ptr = new User;
 	User* tmp2_ptr = new User;
