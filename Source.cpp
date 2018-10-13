@@ -49,6 +49,9 @@ void inFile(User* head, const char* type);
 void selection_sort_shit(User** head, const char* field);
 void changeSalary(User** head);
 int fool(int beg, int end);
+bool condit(const char* field, User* frst, User* scnd);
+User* min_create();
+void swap(User** head, User* tmp1_prev, User* tmp1_ptr, User* tmp2_prev, User* tmp2_ptr);
 
 int main() {
 
@@ -365,55 +368,24 @@ void sort_set(User** head) {
 void selection_sort_shit(User** head, const char* field) {
 	User* tmp1_ptr = new User;
 	User* tmp2_ptr = new User;
-
 	User* step1 = new User;
 	User* step2 = new User;
 	step1 = *head;
 	step2 = (*head)->next;
-
 	User* min = new User;
-
 	User* tmp1_prev = new User;
 	User* tmp2_prev = new User;
-	User* tmp3 = new User;
 	int count = 0;
-
 	while (step2 != NULL) {
 		tmp1_ptr = step1;
 		tmp2_ptr = step2;
-
-		min = new User;
-		if (strcmp(field, "first_name") == 0){
-			/*1*/min->first_name = "€€€€€€€€€€€€€€";
-		}
-		else if (strcmp(field, "second_name") == 0) {
-			min->second_name = "€€€€€€€€€€€€€€";
-		}
-		else if (strcmp(field, "id") == 0) {
-			min->id = 100000;
-		}
-		else if (strcmp(field, "age") == 0) {
-			min->age = 100;
-		}
-		else if (strcmp(field, "date") == 0) {
-			for (int i = 0; i < 3; i++) {
-				min->date[i] = 3000;
-			}
-		}
+		min = min_create();
 		tmp1_prev = *head;
 		tmp2_prev = *head;
-		tmp3 = NULL;
 		while (tmp2_ptr != NULL) {		//ищем минимальный элемент в неотсортированной части списка
-
-			/*1*/if ((strcmp(field, "first_name") == 0 && strcmp(tmp2_ptr->first_name, min->first_name) < 0) ||
-					(strcmp(field, "second_name") == 0 && strcmp(tmp2_ptr->second_name, min->second_name) < 0) ||
-					(strcmp(field, "id") == 0 && tmp2_ptr->id < min->id) || 
-					(strcmp(field, "age") == 0 && tmp2_ptr->age < min->age) ||
-					(strcmp(field, "date") == 0 && (tmp2_ptr->date[2] < min->date[2] || (tmp2_ptr->date[2] == min->date[2] && tmp2_ptr->date[1] < min->date[1]) || (tmp2_ptr->date[2] == min->date[2] && tmp2_ptr->date[1] == min->date[1] && tmp2_ptr->date[0] < min->date[0])))) 
-				{
-					min = tmp2_ptr;
-				}/*2*/
-
+			if (condit(field, tmp2_ptr, min)){
+				min = tmp2_ptr;
+			}
 			tmp2_ptr = tmp2_ptr->next;
 		}
 		tmp2_ptr = min;
@@ -426,51 +398,17 @@ void selection_sort_shit(User** head, const char* field) {
 			tmp2_prev = tmp2_prev->next;
 		}
 		int flag_super = 0;
-		if ((strcmp(field, "first_name") == 0 && strcmp(tmp2_ptr->first_name, tmp1_ptr->first_name) < 0) ||
-			(strcmp(field, "second_name") == 0 && strcmp(tmp2_ptr->second_name, tmp1_ptr->second_name) < 0) ||
-			(strcmp(field, "id") == 0 && tmp2_ptr->id < tmp1_ptr->id) ||
-			(strcmp(field, "age") == 0 && tmp2_ptr->age < tmp1_ptr->age) ||
-			(strcmp(field, "date") == 0 && (tmp2_ptr->date[2] < tmp1_ptr->date[2] || (tmp2_ptr->date[2] == tmp1_ptr->date[2] && tmp2_ptr->date[1] < tmp1_ptr->date[1]) || (tmp2_ptr->date[2] == tmp1_ptr->date[2] && tmp2_ptr->date[1] == tmp1_ptr->date[1] && tmp2_ptr->date[0] < tmp1_ptr->date[0]))))
-		{
+		if (condit(field, tmp2_ptr, tmp1_ptr)){
 			flag_super = 1;
 		}
-
-		/*1*/if (flag_super == 1) {//обмен элементов местами	
-			if (tmp1_ptr == tmp2_prev && tmp1_ptr != *head) {
-				tmp1_ptr->next = tmp2_ptr->next;
-				tmp2_ptr->next = tmp1_ptr;
-
-				tmp1_prev->next = tmp2_ptr;
-			}
-			else if (tmp1_ptr == tmp2_prev && tmp1_ptr == *head) {
-				tmp1_ptr->next = tmp2_ptr->next;
-				tmp2_ptr->next = tmp1_ptr;
-
-				*head = tmp2_ptr;
-			}
-			else if (tmp1_ptr != tmp2_prev && tmp1_ptr != *head) {
-				tmp3 = tmp1_ptr->next;
-				tmp1_ptr->next = tmp2_ptr->next;
-				tmp2_ptr->next = tmp3;
-
-				tmp1_prev->next = tmp2_ptr;
-				tmp2_prev->next = tmp1_ptr;
-			}
-			else if (tmp1_ptr != tmp2_prev && tmp1_ptr == *head) {
-				tmp3 = tmp1_ptr->next;
-				tmp1_ptr->next = tmp2_ptr->next;
-				tmp2_ptr->next = tmp3;
-
-				tmp2_prev->next = tmp1_ptr;
-				*head = tmp2_ptr;
-			}
-		}/*2*/
+		if (flag_super == 1) {//обмен элементов местами	
+			swap(head, tmp1_prev, tmp1_ptr, tmp2_prev, tmp2_ptr);
+		}
 		count++;
 		step1 = *head;
 		for (int i = 0; i < count; i++) {	//переход на следующий шаг в цикле
 			step1 = step1->next;
-		}
-		step2 = step1->next;
+		}step2 = step1->next;
 	}
 }
 
@@ -618,5 +556,50 @@ bool condit(const char* field, User* frst, User* scnd) {
 		return 1;
 	}else {
 		return 0;
+	}
+}
+
+User* min_create() {
+	User* min = new User;
+	min->first_name = "€€€€€€€€€€€€€€";
+	min->second_name = "€€€€€€€€€€€€€€";
+	min->id = 100000;
+	min->age = 100;
+	for (int i = 0; i < 3; i++) {
+		min->date[i] = 3000;
+	}
+	return min;
+}
+
+void swap(User** head, User* tmp1_prev, User* tmp1_ptr, User* tmp2_prev, User* tmp2_ptr) {
+	User* tmp3 = new User;
+	tmp3 = nullptr;
+	if (tmp1_ptr == tmp2_prev && tmp1_ptr != *head) {
+		tmp1_ptr->next = tmp2_ptr->next;
+		tmp2_ptr->next = tmp1_ptr;
+
+		tmp1_prev->next = tmp2_ptr;
+	}
+	else if (tmp1_ptr == tmp2_prev && tmp1_ptr == *head) {
+		tmp1_ptr->next = tmp2_ptr->next;
+		tmp2_ptr->next = tmp1_ptr;
+
+		*head = tmp2_ptr;
+	}
+	else if (tmp1_ptr != tmp2_prev && tmp1_ptr != *head) {
+		tmp3 = tmp1_ptr->next;
+		tmp1_ptr->next = tmp2_ptr->next;
+		tmp2_ptr->next = tmp3;
+
+		tmp1_prev->next = tmp2_ptr;
+		tmp2_prev->next = tmp1_ptr;
+	}
+	else if (tmp1_ptr != tmp2_prev && tmp1_ptr == *head) {
+		tmp3 = tmp1_ptr->next;
+		tmp1_ptr->next = tmp2_ptr->next;
+		tmp2_ptr->next = tmp3;
+
+		tmp2_prev->next = tmp1_ptr;
+		*head = tmp2_ptr;
 	}
 }
