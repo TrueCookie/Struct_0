@@ -46,12 +46,18 @@ void setUpload(User* head);
 void fromFile(User** head, int* vacant_id, const char* type);
 void fromBinFileAlt(User** head, int* vacant_id);
 void inFile(User* head, const char* type);
-void selection_sort_shit(User** head, const char* field);
+void selection_sort_shit(User** head, bool(*cmp)(User* frst, User* scnd));
 void changeSalary(User** head);
 int fool(int beg, int end);
 bool condit(const char* field, User* frst, User* scnd);
 User* min_create();
 void swap(User** head, User* tmp1_prev, User* tmp1_ptr, User* tmp2_prev, User* tmp2_ptr);
+bool condit_f_n(User* frst, User* scnd);
+bool condit_s_n(User* frst, User* scnd);
+bool condit_id(User* frst, User* scnd);
+bool condit_age(User* frst, User* scnd);
+bool condit_date(User* frst, User* scnd);
+
 
 int main() {
 
@@ -320,7 +326,7 @@ User* search_brday(User* user) {
 
 void action_set(User** head, int* global_id) {
 	cout << endl << " 0-Показать список / 1-Добавить нового пользователя / 2-Удалить пользователя /" << endl
-		 << " 3-Сортировать список / 4-Загрузить список / 5-Сохранить список в файл / 6-Изменить доклад / 7-Выход " << endl;
+		 << " 3-Сортировать список / 4-Загрузить список / 5-Сохранить список в файл / 6-Изменить оклад / 7-Выход " << endl;
 	cout << "Выберите действие: ";
 	int set;
 	set = fool(0, 7);
@@ -352,20 +358,20 @@ void sort_set(User** head) {
 	cin >> set;
 
 	switch (set) {
-	case 1: selection_sort_shit(head, "id");
+	case 1: selection_sort_shit(head, condit_id);
 		break;
-	case 2: selection_sort_shit(head, "first_name");
+	case 2: selection_sort_shit(head, condit_f_n);
 		break;
-	case 3: selection_sort_shit(head, "second_name");
+	case 3: selection_sort_shit(head, condit_s_n);
 		break;
-	case 4: selection_sort_shit(head, "age");
+	case 4: selection_sort_shit(head, condit_age);
 		break;
-	case 5: selection_sort_shit(head, "date");
+	case 5: selection_sort_shit(head, condit_date);
 		break;
 	}
 }
 
-void selection_sort_shit(User** head, const char* field) {
+void selection_sort_shit(User** head, bool(*cmp)(User* frst, User* scnd)) {
 	User* tmp1_ptr = new User;
 	User* tmp2_ptr = new User;
 	User* step1 = new User;
@@ -383,7 +389,7 @@ void selection_sort_shit(User** head, const char* field) {
 		tmp1_prev = *head;
 		tmp2_prev = *head;
 		while (tmp2_ptr != NULL) {		//ищем минимальный элемент в неотсортированной части списка
-			if (condit(field, tmp2_ptr, min)){
+			if (cmp(tmp2_ptr, min)){
 				min = tmp2_ptr;
 			}
 			tmp2_ptr = tmp2_ptr->next;
@@ -398,7 +404,7 @@ void selection_sort_shit(User** head, const char* field) {
 			tmp2_prev = tmp2_prev->next;
 		}
 		int flag_super = 0;
-		if (condit(field, tmp2_ptr, tmp1_ptr)){
+		if (cmp(tmp2_ptr, tmp1_ptr)){
 			flag_super = 1;
 		}
 		if (flag_super == 1) {//обмен элементов местами	
@@ -546,17 +552,20 @@ int fool(const int beg, const int end) {
 	return val;
 }
 
-bool condit(const char* field, User* frst, User* scnd) {
-	/*1*/if ((strcmp(field, "first_name") == 0 && strcmp(frst->first_name, scnd->first_name) < 0) ||
-		(strcmp(field, "second_name") == 0 && strcmp(frst->second_name, scnd->second_name) < 0) ||
-		(strcmp(field, "id") == 0 && frst->id < scnd->id) ||
-		(strcmp(field, "age") == 0 && frst->age < scnd->age) ||
-		(strcmp(field, "date") == 0 && (frst->date[2] < scnd->date[2] || (frst->date[2] == scnd->date[2] && frst->date[1] < scnd->date[1]) || (frst->date[2] == scnd->date[2] && frst->date[1] == scnd->date[1] && frst->date[0] < scnd->date[0]))))
-	{
-		return 1;
-	}else {
-		return 0;
-	}
+bool condit_f_n(User* frst, User* scnd) {
+	return strcmp(frst->first_name, scnd->first_name) < 0;
+}
+bool condit_s_n(User* frst, User* scnd) {
+	return (strcmp(frst->second_name, scnd->second_name) < 0);
+}
+bool condit_id(User* frst, User* scnd) {
+	return (frst->id < scnd->id);
+}
+bool condit_age(User* frst, User* scnd) {
+	return (frst->age < scnd->age);
+}
+bool condit_date(User* frst, User* scnd) {
+	return ((frst->date[2] < scnd->date[2] || (frst->date[2] == scnd->date[2] && frst->date[1] < scnd->date[1]) || (frst->date[2] == scnd->date[2] && frst->date[1] == scnd->date[1] && frst->date[0] < scnd->date[0])));
 }
 
 User* min_create() {
@@ -603,3 +612,4 @@ void swap(User** head, User* tmp1_prev, User* tmp1_ptr, User* tmp2_prev, User* t
 		*head = tmp2_ptr;
 	}
 }
+
