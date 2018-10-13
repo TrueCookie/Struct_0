@@ -48,6 +48,7 @@ void fromBinFileAlt(User** head, int* vacant_id);
 void inFile(User* head, const char* type);
 void selection_sort_shit(User** head, const char* field);
 void changeSalary(User** head);
+int fool(int beg, int end);
 
 int main() {
 
@@ -210,7 +211,6 @@ void insert(User** head, User* next_User, User* prev_User) { // insert new User 
 }
 
 void deleteUser(User** head, User* someUser) {
-
 	if (someUser != nullptr) {
 		if (someUser == *head) {
 			*head = (*head)->next;
@@ -260,15 +260,12 @@ User* search_set(User* user) {
 
 User* search_id(User* user) {
 
-	//user = nullptr;  WWTF?
-
 	cout << "Введите id: ";
 	int val;
 	cin >> val;
 	while (user != nullptr && user->id != val) {
 		user = user->next;
 	}
-	
 	return user; 
 }
 
@@ -278,7 +275,7 @@ User* search_f_name(User* user) {
 	char* val = new char[32];
 	cin.getline(val, 32);
 	cin >> val;
-	while (user != nullptr && user->first_name != val) {
+	while (user != nullptr && strcmp(user->first_name,val) != 0) {
 		user = user->next;
 	}
 	return user;
@@ -290,7 +287,7 @@ User* search_s_name(User* user) {
 	char* val = new char[32];
 	cin.getline(val, 32);
 	cin >> val;
-	while (user != nullptr && user->second_name != val) {
+	while (user != nullptr && strcmp(user->second_name,val) !=0) {
 		user = user->next;
 	}
 	return user;
@@ -323,7 +320,7 @@ void action_set(User** head, int* global_id) {
 		 << " 3-Сортировать список / 4-Загрузить список / 5-Сохранить список в файл / 6-Изменить доклад / 7-Выход " << endl;
 	cout << "Выберите действие: ";
 	int set;
-	cin >> set;
+	set = fool(0, 7);
 
 	switch(set){
 	case 0: printList(*head);
@@ -588,9 +585,38 @@ void inFile(User* head, const char* type) {
 }
 
 void changeSalary(User** head) {
-	User* sub = search_set(*head);
+	User* sub = new User;
+	sub = nullptr;
+	sub = search_set(*head);
+	while(sub == nullptr) {
+		cout << "Введите корректное значение: ";
+		sub = search_set(*head);
+	}
 	printUser(sub);
 	int new_salary = 0;
 	cout << "Введите новый оклад: "; cin >> new_salary;
 	sub->salary = new_salary;
+}
+
+int fool(const int beg, const int end) {
+	int val;
+		cin >> val;
+		while (val < beg || val > end) {
+			cout << "Введите корректное значение: ";
+			cin >> val;
+		}
+	return val;
+}
+
+bool condit(const char* field, User* frst, User* scnd) {
+	/*1*/if ((strcmp(field, "first_name") == 0 && strcmp(frst->first_name, scnd->first_name) < 0) ||
+		(strcmp(field, "second_name") == 0 && strcmp(frst->second_name, scnd->second_name) < 0) ||
+		(strcmp(field, "id") == 0 && frst->id < scnd->id) ||
+		(strcmp(field, "age") == 0 && frst->age < scnd->age) ||
+		(strcmp(field, "date") == 0 && (frst->date[2] < scnd->date[2] || (frst->date[2] == scnd->date[2] && frst->date[1] < scnd->date[1]) || (frst->date[2] == scnd->date[2] && frst->date[1] == scnd->date[1] && frst->date[0] < scnd->date[0]))))
+	{
+		return 1;
+	}else {
+		return 0;
+	}
 }
